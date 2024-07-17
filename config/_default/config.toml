@@ -1,7 +1,7 @@
 baseURL = 'https://c-b.io/'
 languageCode = 'en-us'
 title = 'c-b.io'
-theme = 'hugo-theme-monochrome'
+theme = 'monochrome'
 defaultContentLanguage = "en"
 enableEmoji = true
 paginate = 5
