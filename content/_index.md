@@ -39,7 +39,7 @@ So I never really went to school for this. TL;DR, after some bad life choices, I
 
 After working for roughly 7 years in that field, I quickly realised that my body would essentially be turned to mush if I kept on going. "But there's OSHA to protect you!!!", yeah right. Like your boss is gonna ask you to take care of your body when you're doing [shutdown work](https://au.jora.com/blog/what-are-shutdown-jobs-and-how-to-get-one/) and every hour that passes costs your client $50k+.
 
-Alright, enough rambling. So during all of my time as a welder I happened to grow a **_passion_** for Cybersecurity. I would literally finish my shift and hop straight onto either [Tryhackme](https://tryhackme.com/) or [Hackthebox](https://www.hackthebox.com/). On my weekends, I participated in as many CTFs as I could because... I enjoyed it! I genuinly did and for as long as I can remember they were the events I looked forward to and that kept me going despite my shit job.
+Alright, enough rambling. So during all of my time as a welder I happened to grow a **_passion_** for Cybersecurity. I would literally finish my shift and hop straight onto either [Tryhackme](https://tryhackme.com/) or [Hackthebox](https://www.hackthebox.com/). On my weekends, I participated in as many CTFs as I could because... I enjoyed it! I genuinely did and for as long as I can remember they were the events I looked forward to and that kept me going despite my shit job.
 
 Fast forward a while, I decided to call it quits. Started looking for Tech Support jobs at a few companies and ended up landing one at an "AI powered search" company (yeah, yeah, buzzwords but you get the idea). Turns out welders are paid less than you'd think where I live so my pay barely took a hit. After a year of actually enjoying what I did for a living and slowly gaining my mental health back, a neat opportunity was presented to me. An _internal CTF_ created by the Offensive Security team! Ah! Just was I was used to. After grinding at it for a day I managed to solve all challenges and ended up with **first place**.
 
@@ -55,9 +55,9 @@ I'm not writing this to establish as an expert in the field. I would even, mysel
 
 # Ham Radio
 
-So obviously I turned a passion into my work. Obviously, because we can't have good things in life, this meant this was no longer a hobbie. And I **needed** a hobbie. This is when I discovered the absolute :sparkles: joys :sparkles: of [Ham radio](https://en.wikipedia.org/wiki/Amateur_radio). Although super cool, it's a pretty fucking big money pit so my setup is still fairly jank.
+So now I've turned a passion into work. Obviously, because we can't have good things in life, this meant this was no longer a hobbie. And I **needed** a hobbie. This is when I discovered the absolute :sparkles: joys :sparkles: of [Ham radio](https://en.wikipedia.org/wiki/Amateur_radio). Although super cool, it's a pretty fucking big money pit so my setup is still fairly jank.
 
-I won't go into my setup here because the intro is already getting a little long but if you're curious to see my setup I encourage you to go see my QRZ page ([VA2CJX](https://www.qrz.com/db/VA2CJX)).
+I won't go into my setup here because the intro is already getting a little long but if you're curious to see my setup I encourage you to go see my QRZ page [VA2CJX](https://www.qrz.com/db/VA2CJX).
 
 ---
 

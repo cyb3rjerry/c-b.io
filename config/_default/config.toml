@@ -14,4 +14,3 @@ series = "series"
 
 [outputs]
 home = ["HTML", "RSS", "JSON"]
-
