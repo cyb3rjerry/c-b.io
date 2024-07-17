@@ -9,6 +9,24 @@
   name = "Blog"
   url = "/blog"
   weight = 2
+   [[navbar]]
+    identifier = "cybersecurity"
+    name = "Cybersecurity"
+    url = "/blog/cybersecurity"
+    parent = "blog"
+    weight = 1
+  [[navbar]]
+    identifier = "homelab"
+    name = "Homelab"
+    url = "/blog/homelab"
+    parent = "blog"
+    weight = 2
+  [[navbar]]
+    identifier = "ham-radio"
+    name = "Ham Radio"
+    url = "/blog/ham"
+    parent = "blog"
+    weight = 3
 
 [[navbar]]
   identifier = "contact"
