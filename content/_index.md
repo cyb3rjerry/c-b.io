@@ -31,12 +31,6 @@ Now I'm already hearing you screeching "but you gotta have _some_ specific inter
 
 So I never really went to school for this. TL;DR, after some bad life choices, I ended up welding for a living. More precisely, I was a sanitary stainless guy which meant I used to build and install medical, food and brewing equipement.
 
-<!-- <div style="display: flex; align-items: stretch; justify-content: center; gap: 10px;">
-    <img src="/images/hospital-cart-washers.png" style="max-width: 33%; flex: 1; object-fit: contain; cursor: pointer;" onclick="window.open('https://www.steris.com')"/>
-    <img src="images/fermenteur.png" style="max-width: 33%; flex: 1; object-fit: contain; cursor: pointer;" onclick="window.open('https://www.ebrequipment.com/')"/>
-    <img src="images/pipes.jpg" style="max-width: 33%; flex: 1; object-fit: contain;"/>
-</div> -->
-
 After working for roughly 7 years in that field, I quickly realised that my body would essentially be turned to mush if I kept on going. "But there's OSHA to protect you!!!", yeah right. Like your boss is gonna ask you to take care of your body when you're doing [shutdown work](https://au.jora.com/blog/what-are-shutdown-jobs-and-how-to-get-one/) and every hour that passes costs your client $50k+.
 
 Alright, enough rambling. So during all of my time as a welder I happened to grow a **_passion_** for Cybersecurity. I would literally finish my shift and hop straight onto either [Tryhackme](https://tryhackme.com/) or [Hackthebox](https://www.hackthebox.com/). On my weekends, I participated in as many CTFs as I could because... I enjoyed it! I genuinely did and for as long as I can remember they were the events I looked forward to and that kept me going despite my shit job.
