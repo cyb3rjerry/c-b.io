@@ -3,7 +3,7 @@ type: blank
 title: c-b.io
 description: "CJ's garbage blog"
 zooming_js: false
-keywords: ["whoami"]
+keywords: []
 ---
 
 # Intro
