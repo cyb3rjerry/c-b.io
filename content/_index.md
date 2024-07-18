@@ -1,7 +1,7 @@
 ---
 type: blank
-title: whoami
-description: "Description of who I am"
+title: c-b.io
+description: "CJ's garbage blog"
 zooming_js: false
 keywords: ["whoami"]
 ---
