@@ -1,4 +1,4 @@
-baseURL = 'https://c-b.io/'
+baseURL = ''
 languageCode = 'en-us'
 title = 'c-b.io'
 theme = 'monochrome'
