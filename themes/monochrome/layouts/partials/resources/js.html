@@ -68,7 +68,7 @@
 
 {{ if (.Scratch.Get "params").enable_site_search }}
     {{ $target_path := printf "js/search-%s.js" .Site.LanguageCode }}
-    {{ $index_url := "https://github.io" }}
+    {{ $index_url := "https://c-b.io/index.json" }}
     {{ $build_opts := dict "targetPath" $target_path "params" (dict "index_url" $index_url) }}
     {{ $search_js := resources.Get "js/search.js" | js.Build $build_opts }}
     {{- if hugo.IsProduction -}}
