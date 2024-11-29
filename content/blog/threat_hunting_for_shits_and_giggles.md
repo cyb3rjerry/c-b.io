@@ -95,3 +95,13 @@ Before going straight into reverse engineering, I think it's worth taking a bit 
 To fully understand exactly what we're dealing with, let's load the binary into a solid tool that my [MRE certification](https://www.mosse-institute.com/certifications/mre-certified-reverse-engineer.html) taught me about: [PEStudio](https://www.winitor.com/download2). Simply put, PEStudio parses [PE files](https://en.wikipedia.org/wiki/Portable_Executable#:~:text=The%20Portable%20Executable%20(PE)%20format,systems%2C%20and%20in%20UEFI%20environments.) and it's header to establish what the file does (from a static perspective). This gives us insight into if the file imports or exports function, the binary type, plaintext strings, which sections are present and a ton more info. Very useful too, highly recommend it. Now lets load Chrome.exe into it.
 
 ![Chrome.exe Loaded Into PEStudio](/images/pe-studio-chromeexe.png)
+
+
+
+
+
+{{< icon-group >}}
+{{< icon vendor="simple" name="github" link="https://github.com/cyb3rjerry">}} 
+{{< icon vendor="simple" name="twitter" link="https://twitter.com/cyb3rjerry">}}
+{{< icon vendor="simple" name="bluesky" link="https://bsky.app/profile/c-b.io">}}
+{{< /icon-group>}}
