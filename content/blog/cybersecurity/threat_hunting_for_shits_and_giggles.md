@@ -81,4 +81,4 @@ Upon clicking one of the IPs/domains, you'll see a nice list of files which you 
 
 More so, you'll notice you get a shit ton of tags (sometimes) that nudge you at why these files are potentially malicious. If you click on the three dots to the right, you'll also get presented a few options of things you can do with those files.
 
-![File Detail Example](/images/details-for-file.png)
+![File Detail Example](/images/details-for-file.png =250x)
