@@ -7,5 +7,3 @@ type: "postcard"
 toc: true
 ---
 
-{{< recent-posts sortby="lastMod" limit=5 >}}
-
