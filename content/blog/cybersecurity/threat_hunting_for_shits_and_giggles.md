@@ -46,7 +46,7 @@ If you take a look on the left of the image, you'll notice we have three main ta
 
 We'll focus on the one that gives us open dirs for now :)
 
-## AttackCapture
+### AttackCapture
 
 When clicking on the AttackCapture tab, you'll land on a page that's chock-full of information. We get IP addresses/URLs, a number of file, a trigger and a first seen value. To the best of my knowledge (which ain't much), they're always ordered from newest to oldest.
 
@@ -78,3 +78,17 @@ Upon clicking one of the IPs/domains, you'll see a nice list of files which you 
 More so, you'll notice you get a shit ton of tags (sometimes) that nudge you at why these files are potentially malicious. If you click on the three dots to the right, you'll also get presented a few options of things you can do with those files.
 
 ![File Detail Example](/images/details-for-file.png)
+
+From there, we can copy the raw file URL (the one that actually points to the C2) but that's not always good. Maybe since it's been scanned, the malicious actors have taken it down. This is where the `Download File or Share` comes in pretty darn handy. TL;DR, hunt.io saves those files (and their copies if they change overtime) to an S3 bucket which allows us to get access to that file even if it "doesn't exist anymore". You can also download it as a password protected zip to make sure your AV doesn't come screaming at you for downloading malware.
+
+Funnily enough, the Chrome.exe kinda reminded me of [an article](https://www.sonicwall.com/blog/fake-google-chrome-website-tricks-users-into-installing-malware) I saw online a little while back about threat actors (TAs) running a campaign to try and fool people into "downloading chrome" by convincing people to run an executable. In the article, the show that the malicious domain is `hxxps://google[.]tw[.]cn/` which could easily fool a ton of people.
+
+Why not dive into it?
+
+## Chrome.exe
+
+### Doing a bit of recon
+
+To fully understand exactly what we're dealing with, let's load the binary into a solid tool that my [MRE certification](https://www.mosse-institute.com/certifications/mre-certified-reverse-engineer.html) taught me about: [PEStudio](https://www.winitor.com/download2). Simply put, PEStudio parses [PE files](https://en.wikipedia.org/wiki/Portable_Executable#:~:text=The%20Portable%20Executable%20(PE)%20format,systems%2C%20and%20in%20UEFI%20environments.) and it's header to establish what the file does (from a static perspective). This gives us insight into if the file imports or exports function, the binary type, plaintext strings, which sections are present and a ton more info. Very useful too, highly recommend it. Now lets load Chrome.exe into it.
+
+![Chrome.exe Loaded Into PEStudio](images/pe-studio-chromeexe.png)
