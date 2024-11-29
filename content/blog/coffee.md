@@ -1,6 +1,8 @@
 ---
 title: "Support me"
 weight: 2
+tags: ["contact"]
+date: "2024-11-27"
 ---
  
 
