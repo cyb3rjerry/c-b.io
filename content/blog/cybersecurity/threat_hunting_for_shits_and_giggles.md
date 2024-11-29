@@ -67,7 +67,6 @@ Before delving too deep into the information provided to us, I think it's fair t
 - tweet: You get the idea by now
 - Cobalt Strike Scan Signature: Infra identified as a Cobalt Strike C2
 
-![Detect Infrastructure](/images/general-iocs-attackcapture.png)
 
 I won't enumerate all of them but hopefully you've got a good idea of what all that means by now. If not, go grab a coffee or something.
 
@@ -81,4 +80,4 @@ Upon clicking one of the IPs/domains, you'll see a nice list of files which you 
 
 More so, you'll notice you get a shit ton of tags (sometimes) that nudge you at why these files are potentially malicious. If you click on the three dots to the right, you'll also get presented a few options of things you can do with those files.
 
-![File Detail Example](/images/details-for-file.png =250x)
+![File Detail Example](/images/details-for-file.png)
