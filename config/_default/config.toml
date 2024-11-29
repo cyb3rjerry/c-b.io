@@ -13,4 +13,4 @@ tag = "tags"
 series = "series"
 
 [outputs]
-home = ["HTML", "RSS", "JSON"]
+home = ["HTML", "RSS", "JSON", "ROBOTS"]
