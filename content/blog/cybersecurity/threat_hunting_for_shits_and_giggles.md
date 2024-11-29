@@ -11,10 +11,6 @@ toc: true
 
 I'll start by saying this post is _not_ endorsed by [hunt.io](https://hunt.io/). I just happen to be a really big fan of what they're doing.
 
-## TOC
-- [Some hackers suck at OpSec](#some-hackers-suck-at-opsec)
-- [hunt.io](#huntio)
-- [AttackCapture]
 
 ## Some hackers suck at OpSec
 
