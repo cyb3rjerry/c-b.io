@@ -8,7 +8,7 @@ keywords: []
 
 ## Latest posts
 
-{{< recent-posts sortby="lastMod" limit="5" >}}
+{{< recent-posts sortby="publishDate" limit="5" >}}
 
 ## Intro
 
