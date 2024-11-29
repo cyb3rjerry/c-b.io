@@ -6,5 +6,3 @@ tags: ["index"]
 type: "postcard"
 toc: true
 ---
-
-{{< socials >}}
