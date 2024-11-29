@@ -34,7 +34,7 @@ When first logging in, you're greeted by a handy dandy dashboard that gives you 
 
 ![hunt.io dashboard](/images/huntio-dashboard.png)
 
-If you take a look on the left of the image, you'll notice we have three main tabs:
+If you take a look on the left of the image, you'll notice we have three main tabs which each contain a few goodies:
 
 1. Search
     1. By IP Address
@@ -47,4 +47,38 @@ If you take a look on the left of the image, you'll notice we have three main ta
     5. Feeds
 3. Account
 
-### AttackCapture
+We'll focus on the one that gives us open dirs for now :)
+
+## AttackCapture
+
+When clicking on the AttackCapture tab, you'll land on a page that's chock-full of information. We get IP addresses/URLs, a number of file, a trigger and a first seen value. To the best of my knowledge (which ain't much), they're always ordered from newest to oldest.
+
+![AttackCapture Portal](/images/attackcapture-portal.png)
+
+### Triggers
+
+Before delving too deep into the information provided to us, I think it's fair to establish what a trigger is. While I couldn't find official documentation describing how it works, I'm fairly confident it's simply, as the title suggests, what triggered that URL to be flagged as potentially malicious. We'll often notice the following categories:
+
+- **hash_match**: When one or more of the files matches a known and catalogued hash. Although this is _usually_ reliable, [it's not perfect](https://detect-respond.blogspot.com/2022/04/stop-using-hashes-for-detection-and.html).
+- Keyword found: When specific filename keywords match known offensive tools. This is probably the most unreliable off all triggers for the simple reason that filenames such as `Cover Vitamins&Nucleic Acid Colour.pdf` will match for tools like [Nuclei](https://github.com/projectdiscovery/nuclei). Just to be clear, I'm not shitting on their detection. I'm just saying this trigger is the most false positive prone one.
+- Triage Community: These are simply IPs/domains that were submitted by the community as being known to be malicious. These tend to be pretty reliable (until some jackass decides to spam garbage I guess)
+- urlhaus: As the name suggests, it's IPs/domains found by [urlhaus](https://urlhaus.abuse.ch/)
+- IOC IPs from Abuse.ch: Same as urlhaus, it's all from [abuse.ch](https://abuse.ch/)
+- tweet: You get the idea by now
+- Cobalt Strike Scan Signature: Infra identified as a Cobalt Strike C2
+
+![Detect Infrastructure](/images/general-iocs-attackcapture.png)
+
+I won't enumerate all of them but hopefully you've got a good idea of what all that means by now. If not, go grab a coffee or something.
+
+P.S.: If someone at hunt.io is reading this, please normalize the casing of your triggers. It looks weird.
+
+### Reviewing an entry
+
+Upon clicking one of the IPs/domains, you'll see a nice list of files which you can interact with. More so, you'll also notice a bit of context such as the origin of the IP/domain and the total size of the directory.
+
+![Example Of A Malicious Host](/images/malicious-host.png)
+
+More so, you'll notice you get a shit ton of tags (sometimes) that nudge you at why these files are potentially malicious. If you click on the three dots to the right, you'll also get presented a few options of things you can do with those files.
+
+![File Detail Example](/images/details-for-file.png)
