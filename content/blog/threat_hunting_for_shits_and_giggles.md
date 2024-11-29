@@ -3,7 +3,7 @@ aliases: ["posts", "articles", "blog", "showcase", "docs"]
 title: "Threat hunting for shits and giggles"
 author: "Cedric 'Cyb3rjerry' Brisson"
 tags: ["threat hunting", "reverse engineering"]
-type: "blank"
+type: "postcard"
 toc: true
 date: "2024-11-28"
 ---
