@@ -19,7 +19,7 @@ Cedric "CJ" Brisson
 
 Welcome! Not sure how you stumbled upon my corner of the internet, but here we are, sharing this space and wondering what comes next. Allow me to break the ice.
 
-I’m Cedric (CJ for short), a passionate tech enthusiast and self-proclaimed nerd. My journey has been anything but traditional. I’m the type who dives headfirst into learning something new, masters just enough to be dangerous, and then chases the next shiny thing. Jack of all trades, master of none—but I like it that way. Let me tell you my story.
+I’m CJ, a passionate tech enthusiast and cybersecurity nerd. My journey has been anything but traditional. I’m the type who dives headfirst into learning something new, masters just enough to be dangerous, and then chases the next shiny thing. ADHD much? Jack of all trades, master of none—but I like it that way. Let me tell you how I got into all of this.
 
 ---
 
@@ -29,11 +29,11 @@ I didn’t take the conventional route into cybersecurity. My career started in 
 
 During that time, I discovered a deep passion for cybersecurity. My evenings were spent on platforms like TryHackMe and HackTheBox, and weekends were filled with CTF competitions. I wasn’t just learning—I was thriving.
 
-Eventually, I decided to transition into tech. I landed a tech support job at an "AI-powered search" company, and despite the switch, my pay barely took a hit. A year into the role, I got my big break: an internal CTF organized by the Offensive Security team. After a day of grinding, I solved all the challenges and secured first place.
+Eventually, I decided to transition into tech. I landed a tech support job at an "AI-powered search" company. A year into the role, I got my big break: an internal CTF organized by the Offensive Security team. After a day of grinding, I solved all the challenges and secured first place.
 
 That was my gateway to a role on the Offensive Security team, where I honed my skills in incident response, pentesting, and corporate culture (turns out, not everyone loves colorful language). Now, I’m the Lead SOC Analyst at the same company where I started in tech support just three years ago.
 
-I’m not here to pose as an expert or authority. I’m here because I love what I do, and I want to share that passion. Take my posts with a grain of salt—but know they’re written with genuine enthusiasm.
+I’m not here to pose as an expert or authority. I’m here because I love what I do, and I want to share that passion. Take my posts with a grain of salt—but know they’re written with genuine enthusiasm. I'm currently taking my [MRE](https://www.mosse-institute.com/certifications/mre-certified-reverse-engineer.html) certification.
 
 ---
 
