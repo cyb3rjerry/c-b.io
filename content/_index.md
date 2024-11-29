@@ -6,7 +6,11 @@ zooming_js: false
 keywords: []
 ---
 
-# Intro
+## Latest posts
+
+{{< recent-posts sortby="lastMod" limit="5" >}}
+
+## Intro
 
 ```bash
 $ whoami
@@ -27,7 +31,7 @@ Now I'm already hearing you screeching "but you gotta have _some_ specific inter
 
 ---
 
-# Cybersecurity
+## Cybersecurity
 
 So I never really went to school for this. TL;DR, after some bad life choices, I ended up welding for a living. More precisely, I was a sanitary stainless guy which meant I used to build and install medical, food and brewing equipment.
 
@@ -47,7 +51,7 @@ I'm not writing this to establish as an expert in the field. I would even, mysel
 
 ---
 
-# Ham Radio
+## Ham Radio
 
 So now I've turned a passion into work. Obviously, because we can't have good things in life, this meant this was no longer a hobbie. And I **needed** a hobbie. This is when I discovered the absolute :sparkles: joys :sparkles: of [Ham radio](https://en.wikipedia.org/wiki/Amateur_radio). Although super cool, it's a pretty fucking big money pit so my setup is still fairly jank.
 
@@ -55,7 +59,7 @@ I won't go into my setup here because the intro is already getting a little long
 
 ---
 
-# Homelab stuff
+## Homelab stuff
 
 So obviously Ham radio wasn't a big enough of a moneypit, I had to build myself a fancy pants homelab! And by fancy pants I mean three almost-not garbage computer glued together with wishful thinking.
 
