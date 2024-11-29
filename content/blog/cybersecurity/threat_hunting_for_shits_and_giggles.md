@@ -36,16 +36,13 @@ When first logging in, you're greeted by a handy dandy dashboard that gives you 
 
 If you take a look on the left of the image, you'll notice we have three main tabs which each contain a few goodies:
 
-1. Search
-    1. By IP Address
-    2. Advanced Search
-2. Adversary Hunting
-    1. AttackCapture
-    2. C2 Infrastructure
-    3. IOC Hunter
-    4. Global Sensors
-    5. Feeds
-3. Account
+1. Search By IP Address
+2. Advanced Search
+3. AttackCapture
+4. C2 Infrastructure
+5. IOC Hunter
+6. Global Sensors
+7. Feeds
 
 We'll focus on the one that gives us open dirs for now :)
 
