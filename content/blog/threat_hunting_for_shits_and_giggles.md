@@ -100,8 +100,10 @@ To fully understand exactly what we're dealing with, let's load the binary into 
 
 
 
-{{< icon-group >}}
-{{< icon vendor="simple" name="github" link="https://github.com/cyb3rjerry">}} 
-{{< icon vendor="simple" name="twitter" link="https://twitter.com/cyb3rjerry">}}
-{{< icon vendor="simple" name="bluesky" link="https://bsky.app/profile/c-b.io">}}
-{{< /icon-group>}}
+<div style="text-align: center;">
+  {{< icon-group >}}
+  {{< icon vendor="simple" name="github" link="https://github.com/cyb3rjerry">}} 
+  {{< icon vendor="simple" name="twitter" link="https://twitter.com/cyb3rjerry">}}
+  {{< icon vendor="simple" name="bluesky" link="https://bsky.app/profile/c-b.io">}}
+  {{< /icon-group>}}
+</div>
