@@ -87,6 +87,8 @@ Why not dive into it?
 
 ## Chrome.exe
 
+Before going straight into reverse engineering, I think it's worth taking a bit of time to comprehend the context behind the binary we've collected. You obviously won't be able to understand _exactly_ what it does from the get-go but it'll most likely give us a few points such as where we should start, which tools we should use, if there's any clear signs that this is malware and stuff like that. It's not obligatory but I feel like it's good practice.
+
 ### Doing a bit of recon
 
 To fully understand exactly what we're dealing with, let's load the binary into a solid tool that my [MRE certification](https://www.mosse-institute.com/certifications/mre-certified-reverse-engineer.html) taught me about: [PEStudio](https://www.winitor.com/download2). Simply put, PEStudio parses [PE files](https://en.wikipedia.org/wiki/Portable_Executable#:~:text=The%20Portable%20Executable%20(PE)%20format,systems%2C%20and%20in%20UEFI%20environments.) and it's header to establish what the file does (from a static perspective). This gives us insight into if the file imports or exports function, the binary type, plaintext strings, which sections are present and a ton more info. Very useful too, highly recommend it. Now lets load Chrome.exe into it.
