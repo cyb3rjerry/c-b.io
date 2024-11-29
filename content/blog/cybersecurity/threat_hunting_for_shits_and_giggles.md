@@ -1,6 +1,6 @@
 ---
 aliases: ["posts", "articles", "blog", "showcase", "docs"]
-title: "Cybersecurity"
+title: "Threat hunting for shits and giggles"
 author: "Cedric 'Cyb3rjerry' Brisson"
 tags: ["threat hunting", "reverse engineering"]
 type: "blank"
