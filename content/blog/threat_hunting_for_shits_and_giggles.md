@@ -96,4 +96,44 @@ To fully understand exactly what we're dealing with, let's load the binary into 
 
 ![Chrome.exe Loaded Into PEStudio](/images/pe-studio-chromeexe.png)
 
+While reviewing the results, a few things stood out. First, it's a well documented piece of malware. [VirtusTotal](https://virustotal.com) flags it as being detected by 57 AVs. Interestingly enough, however, is that's it's flagged as various strains that although somewhat similar work in different ways. These would be: Jalapeno, Bladabindi, XWorm, AsyncRAT & XWorm. We also notice a few mentions of MSIL which is good news because this would point towards a .NET binary which tends to be fairly easy to reverse engineer thanks to DNSpy. Finally, we also notice they've all been flagged somewhat recently (except for SentinelOne which seems to have been aware of it for 227 days).
+
+![VirusTotal Analysis as seen through PEStudio](/images/pestudio-vt-results.png)
+
+### DNSpy
+
+Before delving in the actual reverse engineering, I think it's worth understand _why_ DNSpy works. In essence, for those who aren't aware, [DNSpy](https://github.com/dnSpy/dnSpy) is a tool that can be leveraged to reverse engineer [.NET](https://dotnet.microsoft.com/en-us/) binaries.
+
+Unlike traditional compiled programs that get turned into raw machine code, .NET applications are compiled into Microsoft Intermediate Language (MSIL). MSIL is like a "blueprint" for the program, containing detailed instructions about how the application should run, as well as a ton of metadata about its structure. This metadata includes things like class names, methods, and even strings, making it easier to reverse-engineer than something written in C++ or assembly. MSIL essentially, to my understanding, One may be tempted to think MSIL is similar to assembly but in reality it's closer to bytecode than it is to x86 assembly. While it’s not as high-level as raw source code, it’s definitely more abstract and structured than assembly. Think of it as an intermediate step between source code and machine code.
+
+When you open a .NET binary in DNSpy, it reads the MSIL and decompiles it back into high-level code—usually C# or VB.NET. That essentially gives us code that’s often so close to the original, you’d think it was the developer’s source file. DNSpy doesn’t stop there, though. Its built-in debugger lets you run and manipulate the binary, giving you insight into what the code does at runtime. This combination of static analysis and dynamic debugging makes it an incredibly powerful tool, especially when you're trying to deobfuscate complex methods.
+
+This works because .NET binaries rely on the Common Language Runtime (CLR) to translate MSIL into machine code at runtime. Since the MSIL is still intact inside the binary, DNSpy can peel it apart, function by function, and give you everything you need to understand what the program is doing. That’s why DNSpy is a go-to tool for analyzing malicious .NET software—it turns the malware author’s convenience into your advantage.
+
+### Loading Chrome.exe into DNSpy
+
+Upon loading your file into DNSpy and expanding it, you'll first typically notice entries in yellow. These are the "custom" namespaces used by the binary. In our case, we notice two of them:
+
+1. My
+2. Stub
+
+If we expand both, we're presented a big lists of classes and methods to those classes. The values in orange are methods, the ones in dark green are classes, the ones in orange methods and the ones in purple class fields. If you've got a pair of eyes you will quickly notice all of the names have been obfuscated.
+
+![DNSpy Decompilation Result](/images/dnspy-decompilation-result.png)
+
+I'll spare you the details but what I typically like doing when reversing a .NET binary is:
+
+1. Rename simply methods that are easy to understand
+2. Rename obfuscated imports
+3. Rename based on patterns that are simply to understand (configs for example)
+
+A trick I picked up from [LaureWired](https://www.youtube.com/@lauriewired) is to prepend the malware code with `mw_` to clearly identify what's library code and what's malware code. This tends to make my life easier throughout the reversing process. After a bit of deobfuscation, this is what we end up with.
+
+Upon starting my analysis, I quickly realized the sample was full of obfuscated garbage methods that either only returned an int or returned a random string.
+One nice feature DNSpy offers, is "analysis" where it'll show you all the references made from and to a given asset. This is super helpful as we can quickly triage which values are garbage and which aren't to then delete the useless ones making the
+overall script much cleaner. By leveraging this, we can easily go from classes like these:
+![Unobfuscated Classes](/images/dirty-classes.png)
+
+To classes like these:
+![Cleaned Class](/images/clean-class.png)
 
