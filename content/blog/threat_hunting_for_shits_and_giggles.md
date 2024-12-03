@@ -142,4 +142,4 @@ To classes like these:
 
 So after a bit of messing around I ended up finding that the main function starts by manipulating these values
 
-{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_Main.cs#L15-L38" lang=aspnet tab_size=8 hl="27-34" >}}
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_Main.cs#L15-L38" lang=cs tab_size=4 hl="27-34" >}}
