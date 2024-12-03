@@ -137,3 +137,9 @@ overall script much cleaner. By leveraging this, we can easily go from classes l
 To classes like these:
 ![Cleaned Class](/images/clean-class.png)
 
+
+### Finding the C2 config
+
+So after a bit of messing around I ended up finding that the main function starts by manipulating these values
+
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_Main.cs#L15-L38" lang=c tab_size=8 hl="27-34" />}}
