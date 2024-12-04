@@ -1,6 +1,6 @@
 ---
 aliases: ["posts", "articles", "blog", "showcase", "docs"]
-title: "Threat hunting for shits and giggles"
+title: "Threat hunting for shits and giggles [Part 1]"
 author: "Cedric 'Cyb3rjerry' Brisson"
 tags: ["threat hunting", "reverse engineering", "cybersecurity"]
 type: "postcard"
@@ -8,7 +8,7 @@ toc: true
 date: "2024-11-28"
 ---
 
-# Threat hunting for shits and giggles
+# Threat hunting for shits and giggles [Part 1]
 
 I'll start by saying this post is _not_ endorsed by [hunt.io](https://hunt.io/). I just happen to be a really big fan of what they're doing.
 
@@ -203,3 +203,10 @@ Now digging into the supported commands, we see quite a few. I won't go into all
 - `RemotePlugins`: Removes a plugin
 - `OfflineGet`: Exfiltrates the log file
 - `$Cap`: Takes a screenshot
+
+
+Since this analysis is getting somewhat lengthy I'll split it in a few parts. In the next posts we'll review:
+
+- It's capabilities and how it achieves them
+- Analyzing it in a dynamic environment
+- Creating detection rules based on the IOCs we've found
