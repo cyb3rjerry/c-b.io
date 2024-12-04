@@ -152,9 +152,9 @@ By tracking the methods invoked against those values, we end up finding calls to
 
 Essentially, the code decrypts an AES-encrypted string by creating a decryption key from the MD5 hash the value used to create a named mutex. It uses this key in AES's ECB mode to decrypt the data, converting the Base64 string to bytes, decrypting it, and then returning the result as a readable string.
 
-{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_ConfigDecryptor.cs#" lang=cs tab_sizze=4 hl="11-25">}}
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_ConfigDecryptor.cs#" lang=cs tab_sizze=4 hl="7-18">}}
 
-With a bit of ChatGPT we can easily decrypt these values which gives us the following:
+With a bit of ChatGPT we can easily decrypt and see exactly where the C2 is. This also gives us important data to create detection rules!
 
 ```
 mw_IPAddress: 103.230.121.124
@@ -165,4 +165,11 @@ mw_malwareName: GoogleChrome
 mw_driveInfectionFilename: USB.exe
 mw_InstallPath :%AppData%
 mw_localFilename: Chrome.exe
+mw_logFile: %temp%\Log.tmp
+mw_sleepTimeInSeconds: 10
 ```
+
+### Communications
+
+After reviewing how the malware communicates with it's C2 I noticed a few interesting things. First and foremost, the sample communicates over TCP, it's able to leverage a pool of IPs until it finds one that works and supports making healthchecks by making a "ping" and "pong" request
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/4494e95702b572a98763e863530ddb4a65d50790/Chrome/Stub/mw_Utils.cs#L22-L93" lang=cs tab_sizze=4 hl="36-49,66,77,79">}}
