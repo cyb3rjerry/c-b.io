@@ -173,3 +173,33 @@ mw_sleepTimeInSeconds: 10
 
 After reviewing how the malware communicates with it's C2 I noticed a few interesting things. First and foremost, the sample communicates over TCP, it's able to leverage a pool of IPs until it finds one that works and supports making healthchecks by making a "ping" and "pong" request
 {{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/4494e95702b572a98763e863530ddb4a65d50790/Chrome/Stub/mw_Utils.cs#L22-L93" lang=cs tab_sizze=4 hl="36-49,66,77,79">}}
+
+Now digging into the supported commands, we see quite a few. I won't go into all of them but here's the full list without the detailed explanation:
+
+- `ping/pong`: Used for healthcheck purposes
+- `rec`: Restarts the malware
+- `close`: Full shutdown (without wipe) of the malware
+- `uninstall`: Uninstalls the malware
+- `update`: Updates the malware
+- `DW`: Downloads and executes a PS1 script
+- `FM`: Loads gzip compressed shellcode
+- `LN`: Downloads an executable and runs it
+- `Urlopen`: Opens a URL in the victims browser
+- `Urlhide`: "Silently" (non-browser) downloads a file
+- `PCShutdown`: Shuts down the computer
+- `PCRestart`: Restarts the computer
+- `RunShell`: Runs an arbitrary command sent by the C2 via [Interaction.Shell](https://learn.microsoft.com/en-us/dotnet/api/microsoft.visualbasic.interaction.shell?view=net-9.0)
+- `StartDDos`: Self explanatory
+- `StopDDos`: Self explanatory
+- `StartReport`: Start monitoring and reporting periodically the current running processes
+- `StopReport`: Self explanatory
+- `Xchat`: Not sure
+- `Hosts`: Exfiltrates the `\\drivers\\etc\\hosts` file
+- `Shosts`: Writes data to the hosts file
+- `DDos`: Just replies with `DDos` (unimplemented maybe?)
+- `ngrok`: Not sure
+- `plugin`: Gets currently installed plugins
+- `savePlugins`: Install a new plugin
+- `RemotePlugins`: Removes a plugin
+- `OfflineGet`: Exfiltrates the log file
+- `$Cap`: Takes a screenshot
