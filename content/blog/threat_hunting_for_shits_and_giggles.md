@@ -143,3 +143,26 @@ To classes like these:
 So after a bit of messing around I ended up finding that the main function starts by manipulating these values
 
 {{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_Main.cs#L15-L38" lang=cs tab_size=4 hl="27-34" >}}
+
+Which, after a bit of tracking, we quickly realise are values stored statically here. It's fairly easy, to determine these are encrypted however. I initially thought it could just be plain ol' base64 values but it gave me junk when I tried decoding it the first time.
+
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/mw_config.cs#L1-L42" lang=cs tab_size=4 hl="8-41" >}}
+
+By tracking the methods invoked against those values, we end up finding calls to a decryption method that reads those values (after being base64 decoded) and runs them through a simple AES implementation
+
+Essentially, the code decrypts an AES-encrypted string by creating a decryption key from the MD5 hash the value used to create a named mutex. It uses this key in AES's ECB mode to decrypt the data, converting the Base64 string to bytes, decrypting it, and then returning the result as a readable string.
+
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_ConfigDecryptor.cs#" lang=cs tab_sizze=4 hl="11-25">}}
+
+With a bit of ChatGPT we can easily decrypt these values which gives us the following:
+
+```
+mw_IPAddress: 103.230.121.124
+mw_socketPort: 7000
+mw_AESKey: <123456789>
+mw_XwormTag: <Xwormmm>
+mw_malwareName: GoogleChrome
+mw_driveInfectionFilename: USB.exe
+mw_InstallPath :%AppData%
+mw_localFilename: Chrome.exe
+```
