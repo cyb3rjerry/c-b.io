@@ -146,13 +146,13 @@ So after a bit of messing around I ended up finding that the main function start
 
 Which, after a bit of tracking, we quickly realise are values stored statically here. It's fairly easy, to determine these are encrypted however. I initially thought it could just be plain ol' base64 values but it gave me junk when I tried decoding it the first time.
 
-{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/4494e95702b572a98763e863530ddb4a65d50790/Chrome/mw_config.cs#" lang=cs tab_size=4 hl="13-23" >}}
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/4494e95702b572a98763e863530ddb4a65d50790/Chrome/mw_config.cs#" lang=cs tab_size=4 hl="7-18" >}}
 
 By tracking the methods invoked against those values, we end up finding calls to a decryption method that reads those values (after being base64 decoded) and runs them through a simple AES implementation
 
 Essentially, the code decrypts an AES-encrypted string by creating a decryption key from the MD5 hash the value used to create a named mutex. It uses this key in AES's ECB mode to decrypt the data, converting the Base64 string to bytes, decrypting it, and then returning the result as a readable string.
 
-{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_ConfigDecryptor.cs" lang=cs tab_sizze=4 hl="7-18">}}
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_ConfigDecryptor.cs" lang=cs tab_sizze=4 hl="13-23">}}
 
 With a bit of ChatGPT we can easily decrypt and see exactly where the C2 is. This also gives us important data to create detection rules!
 
