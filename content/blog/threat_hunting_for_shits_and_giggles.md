@@ -142,11 +142,11 @@ To classes like these:
 
 So after a bit of messing around I ended up finding that the main function starts by manipulating these values
 
-{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/Stub/mw_Main.cs#L15-L38" lang=cs tab_size=4 hl="27-34" >}}
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/4494e95702b572a98763e863530ddb4a65d50790/Chrome/Stub/mw_Main.cs#L15-L38" lang=cs tab_size=4 hl="27-34" >}}
 
 Which, after a bit of tracking, we quickly realise are values stored statically here. It's fairly easy, to determine these are encrypted however. I initially thought it could just be plain ol' base64 values but it gave me junk when I tried decoding it the first time.
 
-{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/main/Chrome/mw_config.cs#L1-L42" lang=cs tab_size=4 hl="8-41" >}}
+{{< emgithub target="https://github.com/cyb3rjerry/xworm-source/blob/4494e95702b572a98763e863530ddb4a65d50790/Chrome/Stub/mw_ConfigDecryptor.cs" lang=cs tab_size=4 hl="8-41" >}}
 
 By tracking the methods invoked against those values, we end up finding calls to a decryption method that reads those values (after being base64 decoded) and runs them through a simple AES implementation
 
