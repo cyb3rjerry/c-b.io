@@ -288,8 +288,64 @@ It can also extract WiFi passwords, setup a UAC bypass, embed itself in the star
 
 {{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L361-L371" lang="py" hl="364">}}
 
-### How it targets browsers
+Interestingly, it seems to block AV websites specifically to try and prevent the user from remediating the infection.
 
-Due to the prevalence of Chromium (Brave, Chrome, Opera, ...) it mainly focuses on it. This would get a little long to describe with code snippets so to make it short I'll list it's capabilities with bullet points instead.
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L1083-L1089" lang="py" hl="1087" >}}
 
-- 
+Finally, it's also capable of getting the content of the clipboard, get the current AV, get screenshots and exfiltrate files using either [gofile](https://gofile.io) or [anonfiles](https://anonfiles.com).
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L1215-L1235" lang="py" hl="1226,1232">}}
+
+### Browsers
+
+Due to the prevalence of Chromium (Brave, Chrome, Opera, ...) it mainly focuses on it. This would get a little long to describe with code snippets so to make it short I'll list it's capabilities with bullet points instead. It can:
+
+- Get passwords stored in the browser
+- Get cookies
+- Get the victim's history
+- Get autofill values
+
+
+### Discord
+
+Now this part gets interesting. This sample seems to target Discord very precisely and does a few cool things. First, it leverages Discord's API to establish a victim profile. It fetches the username, id, email, phone number, MFA status, Nitro Status and payment methods from the infected host.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L512-L552" lang="py" hl="516,522-531,535">}}
+
+Another cool trick in it's pocket is it's capability to inject code within Discord itself (or rather it's appdata storage). If we look at the following snippet, we'll notice a large chunk of base64 data.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L655-L682" language="py" hl="659">}}
+
+If we decode it, we get a big block of Javascript that, put simply, tries to hijack any purchases made towards Discord. It'll then steal the CC number, API token & credentials and send them right back to a discord webhook. Funnily enough, it also @everyone in the channel attached to the webhook to make sure EVERYONE knows a CC number has been stolen.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/injected.js#L672-L696" lang="js" hl="677-678">}}
+
+The JS script also contains a link to the an asset hosted in the [original stealer repo](https://github.com/Blank-c/Blank-Grabber) which was archived in mid 2023.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/injected.js#L15-L20" lang="js" hl="17,19">}}
+
+### Session theft
+
+BlankGrabber also seems to focus a lot on session stealing which makes a lot of sense considering a lot of apps are getting harder to break into purely with credential theft. It seems to focus mainly on:
+
+- Minecraft
+- Growtopia
+- Epic (games)
+- Steam
+- UPlay
+- Roblox
+- Telegram
+- Discord
+
+### Crypto
+
+The main focus seems to be on MetaMask. As you'll notice below, it essentially searches for two extension IDs and dumps their content.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L936-L943" lang="py" hl="940" >}}
+
+## What do we make of this sample?
+
+
+
+
+
