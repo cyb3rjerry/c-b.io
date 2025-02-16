@@ -103,7 +103,7 @@ It starts by loading a file called "blank.aes", it reads it's content, reverses 
 
 With this said, we can finally tweak the original script to decrypt `blank.aes` into something we can further analyze. We'll manually import `pyaes` into our script and yank the `zipimporter` line to make sure we don't actually execute it's payload.
 
-{{<highlight python>}}
+{{< highlight python >}}
 import os
 import sys
 import base64
@@ -209,6 +209,7 @@ Yep, I had managed to cause a core dump in Python 💪.
 
 I then promptly reached out to the OALabs Discord channel to get a bit of help I tried other tricks such as writting the header manually and decompiling the file with [pycdc](https://github.com/zrax/pycdc) but sadly, no dice. I'd get a similarily cryptic error:
 ```
+$ pycdc output.pyc
 CreateObject: Got unsupported type 0x0 Error loading file ./output.pyc: std::bad_cast
 ```
 
