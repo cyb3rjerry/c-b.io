@@ -231,3 +231,7 @@ with open('stage4.pyc', 'wb') as f:
 Woohoo! We've finally reached the endgoal! Let's look into the capabilities of BlankGrabber. For those following along, I've uploaded the full code in a Github repo: https://github.com/cyb3rjerry/revengd-malware/tree/main/blankgrabber
 
 ![Final stage decompiled](/images/blank-grabber-final-decomp.png)
+
+First thing I noticed is the C2 b64 encoded string.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L23-L29" lang="py" hl="27">}}
