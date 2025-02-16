@@ -5,7 +5,7 @@ author: "Cedric 'Cyb3rjerry' Brisson"
 tags: ["threat hunting", "reverse engineering", "cybersecurity"]
 type: "postcard"
 toc: true
-date: "2024-11-28"
+date: "2025-02-15"
 ---
 
 # Dissecting a fresh BlankGrabber sample
