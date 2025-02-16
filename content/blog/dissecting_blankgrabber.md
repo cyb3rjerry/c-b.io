@@ -64,3 +64,39 @@ If we scroll a bit lower we see UnpacMe has extracted quite a few files for us a
 ![Unpacme unpacking result](/images/blank-grabber-unpacme-decompiled-files.png)
 
 ![Unpacme unpacked files](/images/blank-grabber-all-unpacked-files.png)
+
+## Reversing the main pyc file
+
+If we take the file titled `31da8165-1390-4961-9dda-f70b7d9e9a79.pyc` and pass it to [PyLingual](https://pylingual.io/) we can get a perfectly reversed Python script. Upon reviewing it, we see it's fairly simple.
+
+```python
+# Decompiled with PyLingual (https://pylingual.io)
+# Internal filename: loader-o.py
+# Bytecode version: 3.13.0rc3 (3571)
+# Source timestamp: 1970-01-01 00:00:00 UTC (0)
+
+import os
+import sys
+import base64
+import zlib
+from pyaes import AESModeOfOperationGCM
+from zipimport import zipimporter
+zipfile = os.path.join(sys._MEIPASS, 'blank.aes')
+module = 'stub-o'
+key = base64.b64decode('lWLqAOPPVuwIsc2H67NJ2Z/IJxVtYdpcyDQQxhN0o7I=')
+iv = base64.b64decode('s83KOFdOnbp77JPN')
+
+def decrypt(key, iv, ciphertext):
+    return AESModeOfOperationGCM(key, iv).decrypt(ciphertext)
+if os.path.isfile(zipfile):
+    with open(zipfile, 'rb') as f:
+        ciphertext = f.read()
+    ciphertext = zlib.decompress(ciphertext[::-1])
+    decrypted = decrypt(key, iv, ciphertext)
+    with open(zipfile, 'wb') as f:
+        f.write(decrypted)
+    zipimporter(zipfile).load_module(module)
+```
+It starts by loading a file called "blank.aes", it reads it's content, reverses it, decrypts it, writes it to a file and imports (and executes) a module called `stub-o`. If you try to run it however you'll notice that PyAES doesn't actually have a function called `AESModeOfOperationGCM`. I'm not gonna lie, this got me confused for quite a bit but after a bit, I ended up realizing it was relying on a modified version of PyAES. Thankfully for us, AESModeOfOperationGCM was re-implemented in the [Grabbers-Deobfuscator](https://github.com/TaxMachine/Grabbers-Deobfuscator) repository.
+
+{{ < emgithub target="https://github.com/TaxMachine/Grabbers-Deobfuscator/blob/089c23e2a2747ffeef652ba18ee49f34f0775e27/utils/pyaes/aes.py#L581-L589" lang="py" > }}
