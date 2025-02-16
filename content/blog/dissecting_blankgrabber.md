@@ -69,7 +69,7 @@ If we scroll a bit lower we see UnpacMe has extracted quite a few files for us a
 
 If we take the file titled `31da8165-1390-4961-9dda-f70b7d9e9a79.pyc` and pass it to [PyLingual](https://pylingual.io/) we can get a perfectly reversed Python script. Upon reviewing it, we see it's fairly simple.
 
-```py
+{{< highlight python >}}
 # Decompiled with PyLingual (https://pylingual.io)
 # Internal filename: loader-o.py
 # Bytecode version: 3.13.0rc3 (3571)
@@ -96,7 +96,8 @@ if os.path.isfile(zipfile):
     with open(zipfile, 'wb') as f:
         f.write(decrypted)
     zipimporter(zipfile).load_module(module)
-```
+{{< /highlight >}}
+
 It starts by loading a file called "blank.aes", it reads it's content, reverses it, decrypts it, writes it to a file and imports (and executes) a module called `stub-o`. If you try to run it however you'll notice that PyAES doesn't actually have a function called `AESModeOfOperationGCM`. I'm not gonna lie, this got me confused for quite a bit but after a bit, I ended up realizing it was relying on a modified version of PyAES. Thankfully for us, AESModeOfOperationGCM was re-implemented in the [Grabbers-Deobfuscator](https://github.com/TaxMachine/Grabbers-Deobfuscator) repository.
 
 {{< emgithub target="https://github.com/TaxMachine/Grabbers-Deobfuscator/blob/089c23e2a2747ffeef652ba18ee49f34f0775e27/utils/pyaes/aes.py#L581-L589" lang="py" >}}
@@ -132,10 +133,10 @@ if os.path.isfile(zipfile):
 
 After running our script, we're left with a nice pyc file called `stub-o.pyc`.
 
-```sh
+{{< highlight console >}}
 $ file stub-o.pyc                                                                                                                  
 stub-o.pyc: Byte-compiled Python module for CPython 3.12 or newer, timestamp-based, .py timestamp: Wed Feb 12 23:43:26 2025 UTC, .py size: 272763 bytes
-```
+{{< /highlight >}}
 
 Time to do the Pylingual dance again! Once it's done rearranging the bits and bytes, we get a gem that looks something like this.
 
@@ -143,7 +144,7 @@ Time to do the Pylingual dance again! Once it's done rearranging the bits and by
 
 Thanfully for us, it's really nothing too complicated. The script essentially creates aliases for imports by obfuscating them with base64 and messing with how they're represented in the script. To keep things short, we go from this
 
-```py
+{{< highlight python >}}
 __________ = eval(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([90, 88, 90, 104, 98, 65, 61, 61])).decode())
 ___________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([90, 50, 86, 48, 89, 88, 82, 48, 99, 103, 61, 61])).decode())
 _______________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([88, 49, 57, 112, 98, 88, 66, 118, 99, 110, 82, 102, 88, 119, 61, 61])).decode())
@@ -152,31 +153,31 @@ ________________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52
 ____________ = lambda ______________: __________(___________(_______________(________________([98, 97, 115, 101, 54, 52]).decode()), ________________([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(______________, ___________(_______________(________________([98, 97, 115, 101, 54, 52]).decode()), ________________([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(________________([90, 88, 104, 108, 89, 119, 61, 61])).decode())
 
 bigOldBlobOfBytes = ...
-```
+{{< /highlight >}}
 
 To this (roughly)
 
-```py
+{{< highlight python >}}
 from lzma import decompress
 
 try:
     decompress(bigOldBlobOfBytes)
 except LZMAError:
     exit(1)
-```
+{{< /highlight >}}
 
 Which we could've also found out by writting those bytes and running `file` on it.
 
-```sh
+{{< highlight console >}}
 $ file stage3.bin                                                                                                                        
 stage3.bin: XZ compressed data, checksum CRC64
-```
+{{< /highlight >}}
 
 ## Stage 3
 
 After extracting the content of the xz file with ye ol' `7z x ./file_name` we're greeted with another garbage (obfuscated) script.
 
-```py
+{{< highlight python >}}
 # Obfuscated using https://github.com/Blank-c/BlankOBF
 _______="AAH...";
 _____="KBhqA...";
@@ -184,11 +185,11 @@ ____="LjNNNNNNNNNNNNNNNNpNN...";
 ______="AACyJ...";
 
 __import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 110, 86, 112, 98, 72, 82, 112, 98, 110, 77, 61])).decode()).exec(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([98, 87, 70, 121, 99, 50, 104, 104, 98, 65, 61, 61])).decode()).loads(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 109, 70, 122, 90, 84, 89, 48])).decode()).b64decode(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 50, 57, 107, 90, 87, 78, 122])).decode()).decode(____, __import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 109, 70, 122, 90, 84, 89, 48])).decode()).b64decode("cm90MTM=").decode())+_____+______[::-1]+_______)))
-```
+{{< /highlight >}}
 
 Which, after a bit of fucking around, gives us something like this
 
-```py
+{{< highlight python >}}
 import base64, codecs, marshal, dis, types, importlib
 
 firstChunk = codecs.decode(bigBlob3, "rot13")
@@ -196,34 +197,34 @@ totalCunks = firstChunk + bigBlob2 + bigBlob4[::-1] + bigBlob1
 unb64 = base64.b64decode(totalCunks)
 unmarshalled = marshal.loads(unb64)
 ...
-```
+{{< /highlight >}}
 
 I'm not gonna lie here, I struggled quite a bit of extracting and reversing the marshalled content. Since the binary was initially tagged as being `Python 3.12+` I kinda went along with the current version of Python I was running (3.12) without questioning it too much. I kept trying and trying to either `dis.dis()` the marshalled object or to dump it as a pyc to then send it to PyLingual but for whatever reason, I kept getting hit with this.
-```
+{{< highlight console >}}
 $ python3 stage3.py
 malloc(): invalid size (unsorted)
 [1]   22904 IOT instruction (core dumped) python3 stage3.py
-```
+{{< /highlight >}}
 
 Yep, I had managed to cause a core dump in Python 💪.
 
 I then promptly reached out to the OALabs Discord channel to get a bit of help I tried other tricks such as writting the header manually and decompiling the file with [pycdc](https://github.com/zrax/pycdc) but sadly, no dice. I'd get a similarily cryptic error:
-```
+{{< highlight console >}}
 $ pycdc output.pyc
 CreateObject: Got unsupported type 0x0 Error loading file ./output.pyc: std::bad_cast
-```
+{{< /highlight >}}
 
 After more messing around, an absolute angel by the name of _________ (temporarily redacted for privacy) essentially told me to double check if my Python version was the same as the executable. I decided to run back to PyLingual to see if it had ID'd the version and lo and behold, it was using <u>version 3.13</u>. Some of you are probably laughing at my by this point but eh, you live and you learn!
 
 After upgrading to v3.13, I was able to dump the marshalled object to a pyc that can be further reversed via this simply line
-```py
+{{< highlight python >}}
 import importlib 
 
 pyc_data = importlib._bootstrap_external._code_to_timestamp_pyc(code)
 
 with open('stage4.pyc', 'wb') as f:
     f.write(pyc_data)
-```
+{{< /highlight >}}
 
 ## Final stage
 
