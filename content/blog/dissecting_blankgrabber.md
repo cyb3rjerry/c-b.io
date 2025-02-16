@@ -69,7 +69,7 @@ If we scroll a bit lower we see UnpacMe has extracted quite a few files for us a
 
 If we take the file titled `31da8165-1390-4961-9dda-f70b7d9e9a79.pyc` and pass it to [PyLingual](https://pylingual.io/) we can get a perfectly reversed Python script. Upon reviewing it, we see it's fairly simple.
 
-```python
+```py
 # Decompiled with PyLingual (https://pylingual.io)
 # Internal filename: loader-o.py
 # Bytecode version: 3.13.0rc3 (3571)
@@ -103,7 +103,7 @@ It starts by loading a file called "blank.aes", it reads it's content, reverses 
 
 With this said, we can finally tweak the original script to decrypt `blank.aes` into something we can further analyze. We'll manually import `pyaes` into our script and yank the `zipimporter` line to make sure we don't actually execute it's payload.
 
-```python
+```py
 import os
 import sys
 import base64
@@ -143,7 +143,7 @@ Time to do the Pylingual dance again! Once it's done rearranging the bits and by
 
 Thanfully for us, it's really nothing too complicated. The script essentially creates aliases for imports by obfuscating them with base64 and messing with how they're represented in the script. To keep things short, we go from this
 
-```python
+```py
 __________ = eval(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([90, 88, 90, 104, 98, 65, 61, 61])).decode())
 ___________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([90, 50, 86, 48, 89, 88, 82, 48, 99, 103, 61, 61])).decode())
 _______________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([88, 49, 57, 112, 98, 88, 66, 118, 99, 110, 82, 102, 88, 119, 61, 61])).decode())
@@ -156,7 +156,7 @@ bigOldBlobOfBytes = ...
 
 To this (roughly)
 
-```python
+```py
 from lzma import decompress
 
 try:
@@ -176,7 +176,7 @@ stage3.bin: XZ compressed data, checksum CRC64
 
 After extracting the content of the xz file with ye ol' `7z x ./file_name` we're greeted with another garbage (obfuscated) script.
 
-```python
+```py
 # Obfuscated using https://github.com/Blank-c/BlankOBF
 _______="AAH...";
 _____="KBhqA...";
@@ -188,7 +188,7 @@ __import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes
 
 Which, after a bit of fucking around, gives us something like this
 
-```python
+```py
 import base64, codecs, marshal, dis, types, importlib
 
 firstChunk = codecs.decode(bigBlob3, "rot13")
@@ -215,7 +215,7 @@ CreateObject: Got unsupported type 0x0 Error loading file ./output.pyc: std::bad
 After more messing around, an absolute angel by the name of _________ (temporarily redacted for privacy) essentially told me to double check if my Python version was the same as the executable. I decided to run back to PyLingual to see if it had ID'd the version and lo and behold, it was using <u>version 3.13</u>. Some of you are probably laughing at my by this point but eh, you live and you learn!
 
 After upgrading to v3.13, I was able to dump the marshalled object to a pyc that can be further reversed via this simply line
-```python
+```py
 import importlib 
 
 pyc_data = importlib._bootstrap_external._code_to_timestamp_pyc(code)
