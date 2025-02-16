@@ -99,4 +99,4 @@ if os.path.isfile(zipfile):
 ```
 It starts by loading a file called "blank.aes", it reads it's content, reverses it, decrypts it, writes it to a file and imports (and executes) a module called `stub-o`. If you try to run it however you'll notice that PyAES doesn't actually have a function called `AESModeOfOperationGCM`. I'm not gonna lie, this got me confused for quite a bit but after a bit, I ended up realizing it was relying on a modified version of PyAES. Thankfully for us, AESModeOfOperationGCM was re-implemented in the [Grabbers-Deobfuscator](https://github.com/TaxMachine/Grabbers-Deobfuscator) repository.
 
-{{ < emgithub target="https://github.com/TaxMachine/Grabbers-Deobfuscator/blob/089c23e2a2747ffeef652ba18ee49f34f0775e27/utils/pyaes/aes.py#L581-L589" lang="py" > }}
+{{< emgithub target="https://github.com/TaxMachine/Grabbers-Deobfuscator/blob/089c23e2a2747ffeef652ba18ee49f34f0775e27/utils/pyaes/aes.py#L581-L589" lang="py" >}}
