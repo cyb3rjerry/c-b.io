@@ -235,3 +235,20 @@ Woohoo! We've finally reached the endgoal! Let's look into the capabilities of B
 First thing I noticed is the C2 b64 encoded string.
 
 {{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L23-L29" lang="py" hl="27">}}
+
+which decodes to `https://discord.com/api/webhooks/1339377338789527583/ZaaIPm4r2pFnKkE4RUXqcS7xZBcizAgYuFYROtiKuY4mBlDtpUuVxpzdEO-vDdFinBBV`. This is interesting because it showcases <i>again</i> messaging apps being an important part of a C2. My little experience so far has shown me time and time again that both Discord and Telegram are frequently leveraged to act both as C2s <i>and</i> as delivery mechanisms/file hosting services. If you search for `cdn.discordapp.com` on [urlquery.net](https://urlquery.net/) you'll notice there's tons of executables being shared through their CDN.
+
+![Discord cdn being leveraged to distribute executables](/images/blank-grabber-discord-cdn.png)
+
+If we keep on scrolling a bit lower we'll notice is that our sample has sandbox detection capabilities (although great ones). It's all wrapped in a class called "VMProtect", not to be confused with [VMProtect](https://vmpsoft.com/). It can:
+
+- Detect the device's UUID and compares it against a blacklist. I couldn't find exactly where these came from but a quick Google search brought me to [a repo](https://github.com/6nz/virustotal-vm-blacklist/blob/main/MachineGuid.txt) which points to them being hostnames used by VirusTotal (or similar services).
+- Detect the device's hostname and compares it against a blacklist. Yet again, I'm not 100% sure of where this comes from but there's a lot of similarities with the [virustotal-vm-blacklist repo](https://github.com/6nz/virustotal-vm-blacklist/blob/main/pc_name_list.txt).
+- Detect the currently used username and compares it against a blacklist. Same similarities to the VT VM Blacklist.
+- Detect if the current IP is related to a hosting provider by leveraging [ip-api.com](http://ip-api.com/).
+- Detect if internet connectivity is being simulated by resolving a random domain that starts with `blank-`.
+- Detect if the current host is running in either VirtualBox or VMWare by querying registry keys, video controllers and `D:\` drive related paths.
+
+If any of these checks return positive, the sample terminates itself.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L65-L131" lang="py" hl="67-69,74,80,94,105,113-116,129">}}
