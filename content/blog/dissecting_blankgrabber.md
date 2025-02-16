@@ -100,3 +100,125 @@ if os.path.isfile(zipfile):
 It starts by loading a file called "blank.aes", it reads it's content, reverses it, decrypts it, writes it to a file and imports (and executes) a module called `stub-o`. If you try to run it however you'll notice that PyAES doesn't actually have a function called `AESModeOfOperationGCM`. I'm not gonna lie, this got me confused for quite a bit but after a bit, I ended up realizing it was relying on a modified version of PyAES. Thankfully for us, AESModeOfOperationGCM was re-implemented in the [Grabbers-Deobfuscator](https://github.com/TaxMachine/Grabbers-Deobfuscator) repository.
 
 {{< emgithub target="https://github.com/TaxMachine/Grabbers-Deobfuscator/blob/089c23e2a2747ffeef652ba18ee49f34f0775e27/utils/pyaes/aes.py#L581-L589" lang="py" >}}
+
+With this said, we can finally tweak the original script to decrypt `blank.aes` into something we can further analyze. We'll manually import `pyaes` into our script and yank the `zipimporter` line to make sure we don't actually execute it's payload.
+
+```python
+import os
+import sys
+import base64
+import zlib
+
+sys.path.insert(0, "/mnt/d/malware/tmp/blankstealer/Grabbers-Deobfuscator/utils")
+
+from pyaes import AESModeOfOperationGCM
+zipfile = 'blank.aes'
+module = 'stub-o'
+key = base64.b64decode('lWLqAOPPVuwIsc2H67NJ2Z/IJxVtYdpcyDQQxhN0o7I=')
+iv = base64.b64decode('s83KOFdOnbp77JPN')
+
+def decrypt(key, iv, ciphertext):
+    return AESModeOfOperationGCM(key, iv).decrypt(ciphertext)
+if os.path.isfile(zipfile):
+    with open(zipfile, 'rb') as f:
+        ciphertext = f.read()
+    ciphertext = zlib.decompress(ciphertext[::-1])
+    decrypted = decrypt(key, iv, ciphertext)
+    with open(zipfile, 'wb') as f:
+        f.write(decrypted)
+```
+## stub-o.pyc
+
+After running our script, we're left with a nice pyc file called `stub-o.pyc`.
+```sh
+$ file stub-o.pyc                                                                                                                  
+stub-o.pyc: Byte-compiled Python module for CPython 3.12 or newer, timestamp-based, .py timestamp: Wed Feb 12 23:43:26 2025 UTC, .py size: 272763 bytes
+```
+
+Time to do the Pylingual dance again! Once it's done rearranging the bits and bytes, we get a gem that looks something like this.
+
+![stub-o decompiled output](/images/blank-grabber-stub-o-content.png)
+
+Thanfully for us, it's really nothing too complicated. The script essentially creates aliases for imports by obfuscating them with base64 and messing with how they're represented in the script. To keep things short, we go from this
+
+```python
+__________ = eval(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([90, 88, 90, 104, 98, 65, 61, 61])).decode())
+___________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([90, 50, 86, 48, 89, 88, 82, 48, 99, 103, 61, 61])).decode())
+_______________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([88, 49, 57, 112, 98, 88, 66, 118, 99, 110, 82, 102, 88, 119, 61, 61])).decode())
+________________ = __________(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 110, 108, 48, 90, 88, 77, 61])).decode())
+
+____________ = lambda ______________: __________(___________(_______________(________________([98, 97, 115, 101, 54, 52]).decode()), ________________([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(______________, ___________(_______________(________________([98, 97, 115, 101, 54, 52]).decode()), ________________([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(________________([90, 88, 104, 108, 89, 119, 61, 61])).decode())
+
+bigOldBlobOfBytes = ...
+```
+To this (roughly)
+```python
+from lzma import decompress
+
+try:
+    decompress(bigOldBlobOfBytes)
+except LZMAError:
+    exit(1)
+```
+
+Which we could've also found out by writting those bytes and running `file` on it.
+```sh
+$ file stage3.bin                                                                                                                        
+stage3.bin: XZ compressed data, checksum CRC64
+```
+
+## Stage 3
+
+After extracting the content of the xz file with ye ol' `7z x ./file_name` we're greeted with another garbage (obfuscated) script.
+```python
+# Obfuscated using https://github.com/Blank-c/BlankOBF
+_______="AAH...";
+_____="KBhqA...";
+____="LjNNNNNNNNNNNNNNNNpNN...";
+______="AACyJ...";
+
+__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 110, 86, 112, 98, 72, 82, 112, 98, 110, 77, 61])).decode()).exec(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([98, 87, 70, 121, 99, 50, 104, 104, 98, 65, 61, 61])).decode()).loads(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 109, 70, 122, 90, 84, 89, 48])).decode()).b64decode(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 50, 57, 107, 90, 87, 78, 122])).decode()).decode(____, __import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 109, 70, 122, 90, 84, 89, 48])).decode()).b64decode("cm90MTM=").decode())+_____+______[::-1]+_______)))
+```
+
+Which, after a bit of fucking around, gives us something like this
+```python
+import base64, codecs, marshal, dis, types, importlib
+
+firstChunk = codecs.decode(bigBlob3, "rot13")
+totalCunks = firstChunk + bigBlob2 + bigBlob4[::-1] + bigBlob1
+unb64 = base64.b64decode(totalCunks)
+unmarshalled = marshal.loads(unb64)
+...
+```
+
+I'm not gonna lie here, I struggled quite a bit of extracting and reversing the marshalled content. Since the binary was initially tagged as being `Python 3.12+` I kinda went along with the current version of Python I was running (3.12) without questioning it too much. I kept trying and trying to either `dis.dis()` the marshalled object or to dump it as a pyc to then send it to PyLingual but for whatever reason, I kept getting hit with this.
+```
+$ python3 stage3.py
+malloc(): invalid size (unsorted)
+[1]   22904 IOT instruction (core dumped) python3 stage3.py
+```
+
+Yep, I had managed to cause a core dump in Python 💪.
+
+I then promptly reached out to the OALabs Discord channel to get a bit of help I tried other tricks such as writting the header manually and decompiling the file with [pycdc](https://github.com/zrax/pycdc) but sadly, no dice. I'd get a similarily cryptic error:
+```
+CreateObject: Got unsupported type 0x0 Error loading file ./output.pyc: std::bad_cast
+```
+
+After more messing around, an absolute angel by the name of _________ (temporarily redacted for privacy) essentially told me to double check if my Python version was the same as the executable. I decided to run back to PyLingual to see if it had ID'd the version and lo and behold, it was using <u>version 3.13</u>. Some of you are probably laughing at my by this point but eh, you live and you learn!
+
+After upgrading to v3.13, I was able to dump the marshalled object to a pyc that can be further reversed via this simply line
+```python
+import importlib 
+
+pyc_data = importlib._bootstrap_external._code_to_timestamp_pyc(code)
+
+with open('stage4.pyc', 'wb') as f:
+    f.write(pyc_data)
+```
+
+## Final stage
+
+Woohoo! We've finally reached the endgoal! Let's look into the capabilities of BlankGrabber. For those following along, I've uploaded the full code in a Github repo: https://github.com/cyb3rjerry/revengd-malware/tree/main/blankgrabber
+
+![Final stage decompiled](/images/blank-grabber-final-decomp.png)
