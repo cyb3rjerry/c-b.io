@@ -8,7 +8,7 @@ keywords: []
 
 ## Latest Posts
 
-{{< recent-posts sortby="lastMod" limit="5" >}}
+{{< recent-posts sortby="publishDate" limit="5" >}}
 
 ## About Me
 
