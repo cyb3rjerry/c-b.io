@@ -103,7 +103,7 @@ It starts by loading a file called "blank.aes", it reads it's content, reverses 
 
 With this said, we can finally tweak the original script to decrypt `blank.aes` into something we can further analyze. We'll manually import `pyaes` into our script and yank the `zipimporter` line to make sure we don't actually execute it's payload.
 
-```language-py
+{{<highlight python>}}
 import os
 import sys
 import base64
@@ -126,7 +126,7 @@ if os.path.isfile(zipfile):
     decrypted = decrypt(key, iv, ciphertext)
     with open(zipfile, 'wb') as f:
         f.write(decrypted)
-```
+{{< /highlight >}}
 
 ## stub-o.pyc
 
