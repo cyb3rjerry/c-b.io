@@ -127,9 +127,11 @@ if os.path.isfile(zipfile):
     with open(zipfile, 'wb') as f:
         f.write(decrypted)
 ```
+
 ## stub-o.pyc
 
 After running our script, we're left with a nice pyc file called `stub-o.pyc`.
+
 ```sh
 $ file stub-o.pyc                                                                                                                  
 stub-o.pyc: Byte-compiled Python module for CPython 3.12 or newer, timestamp-based, .py timestamp: Wed Feb 12 23:43:26 2025 UTC, .py size: 272763 bytes
@@ -151,7 +153,9 @@ ____________ = lambda ______________: __________(___________(_______________(___
 
 bigOldBlobOfBytes = ...
 ```
+
 To this (roughly)
+
 ```python
 from lzma import decompress
 
@@ -162,6 +166,7 @@ except LZMAError:
 ```
 
 Which we could've also found out by writting those bytes and running `file` on it.
+
 ```sh
 $ file stage3.bin                                                                                                                        
 stage3.bin: XZ compressed data, checksum CRC64
@@ -170,6 +175,7 @@ stage3.bin: XZ compressed data, checksum CRC64
 ## Stage 3
 
 After extracting the content of the xz file with ye ol' `7z x ./file_name` we're greeted with another garbage (obfuscated) script.
+
 ```python
 # Obfuscated using https://github.com/Blank-c/BlankOBF
 _______="AAH...";
@@ -181,6 +187,7 @@ __import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes
 ```
 
 Which, after a bit of fucking around, gives us something like this
+
 ```python
 import base64, codecs, marshal, dis, types, importlib
 
