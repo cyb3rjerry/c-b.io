@@ -214,7 +214,7 @@ $ pycdc output.pyc
 CreateObject: Got unsupported type 0x0 Error loading file ./output.pyc: std::bad_cast
 {{< /highlight >}}
 
-After more messing around, an absolute angel by the name of _________ (temporarily redacted for privacy) essentially told me to double check if my Python version was the same as the executable. I decided to run back to PyLingual to see if it had ID'd the version and lo and behold, it was using <u>version 3.13</u>. Some of you are probably laughing at my by this point but eh, you live and you learn!
+After more messing around, an absolute angel by the name of `manbearpiig` essentially told me to double check if my Python version was the same as the executable. I decided to run back to PyLingual to see if it had ID'd the version and lo and behold, it was using <u>version 3.13</u>. Some of you are probably laughing at my by this point but eh, you live and you learn!
 
 After upgrading to v3.13, I was able to dump the marshalled object to a pyc that can be further reversed via this simply line
 {{< highlight python >}}
@@ -350,6 +350,3 @@ Well I think it's first important to acknowledge this is a fairly simple to catc
 More so, we notice the focus on techs and games used by "younger people" such as Discord, Roblox, Growtopia which leads me to believe it's got an even more narrow focus on kids. I'm <s>very much</s> not judging anyone playing Robolox as an adult. Especially knowing Roblox has a [few problems](https://www.bloomberg.com/features/2024-roblox-pedophile-problem/) with adults.
 
 How would I rate the quality of this stealer? Eh, let's give it 3/10 for the effort. This was fairly easy to reverse and doesn't show super complex capabilities.
-
-
-
