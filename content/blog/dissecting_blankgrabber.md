@@ -314,7 +314,7 @@ Now this part gets interesting. This sample seems to target Discord very precise
 
 Another cool trick in it's pocket is it's capability to inject code within Discord itself (or rather it's appdata storage). If we look at the following snippet, we'll notice a large chunk of base64 data.
 
-{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L655-L682" language="py" hl="659">}}
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L655-L682" lang="py" hl="659">}}
 
 If we decode it, we get a big block of Javascript that, put simply, tries to hijack any purchases made towards Discord. It'll then steal the CC number, API token & credentials and send them right back to a discord webhook. Funnily enough, it also @everyone in the channel attached to the webhook to make sure EVERYONE knows a CC number has been stolen.
 
@@ -345,7 +345,11 @@ The main focus seems to be on MetaMask. As you'll notice below, it essentially s
 
 ## What do we make of this sample?
 
+Well I think it's first important to acknowledge this is a fairly simple to catch post-compromise stealer. It's not trying to be sneaky <i>at all</i>. Most modern "corporate" EDRs would most likely catch this very quickly which makes me think this isn't aimed at companies, it's aimed to random people.
 
+More so, we notice the focus on techs and games used by "younger people" such as Discord, Roblox, Growtopia which leads me to believe it's got an even more narrow focus on kids. I'm <s>very much</s> not judging anyone playing Robolox as an adult. Especially knowing Roblox has a [few problems](https://www.bloomberg.com/features/2024-roblox-pedophile-problem/) with adults.
+
+How would I rate the quality of this stealer? Eh, let's give it 3/10 for the effort. This was fairly easy to reverse and doesn't show super complex capabilities.
 
 
 
