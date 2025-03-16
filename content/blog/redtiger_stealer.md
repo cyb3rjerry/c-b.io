@@ -16,6 +16,8 @@ SHA256: b8d1c0436023bf58ea7b0f530ea37ae67bac0e956d9c93376702b4832055e0fd
 
 Distributed as: `Phantom X.exe`
 
+Deobfuscated sample: https://github.com/cyb3rjerry/revengd-malware/tree/main/redtiger
+
 ## How I found this sample
 
 As usual, I grabbed this malware sample from [tria.ge](https://tria.ge) after spotting it flagged as malicious.
@@ -105,6 +107,16 @@ While BlankGrabber focuses on a broad and somewhat indiscriminate approach to in
 4. **Security and Ethical Standards**: While BlankGrabber utilizes aggressive techniques such as disabling Windows Defender and injecting scripts into Discord, this tool maintains stricter boundaries aimed at legitimate use-cases, focusing on operational transparency and compliance.
 
 By clearly defining these distinctions, users can appreciate the strategic choices in efficiency, stealth, configurability, and ethical considerations that set this tool apart from BlankGrabber.
+
+## Discord code injection
+
+Among all the similarities with BlankGrabber, the one that strikes the most is the code that's injected within the Discord app. Both scripts are **nearly** identical although we notice that the code used by RedTiger seems to have regressed on. The Discord JS file from BlankGrabber offered finer grained metadata collection on the victim's account.
+
+![On the left, RedTigers' code that's injected in Discord. On the right, the similar BlankGrabber one](/images/discord-code-redtiger-comp1.png)
+
+![On the left, RedTigers' code that's injected in Discord. On the right, the similar BlankGrabber one](/images/discord-code-redtiger-comp2.png)
+
+![On the left, RedTigers' code that's injected in Discord. On the right, the similar BlankGrabber one](/images/discord-code-redtiger-comp3.png)
 
 ## Conclusion
 
