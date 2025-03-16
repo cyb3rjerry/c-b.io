@@ -13,6 +13,7 @@ date: "2025-03-16"
 Today we'll dive into a fresh malware stealer dubbed **RedTiger**, a sample targeting personal user data, particularly Discord tokens, browser-stored credentials, and gaming accounts. This stealer, like many others seen recently, heavily leverages Discord webhooks for Command & Control (C2).
 
 SHA256: b8d1c0436023bf58ea7b0f530ea37ae67bac0e956d9c93376702b4832055e0fd
+
 Distributed as: `Phantom X.exe`
 
 ## How I found this sample
