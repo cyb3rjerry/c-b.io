@@ -1,0 +1,21 @@
+baseURL = 'https://c-b.io/'
+languageCode = 'en-us'
+title = "c-b.io | Research SIEM"
+theme = 'siem'
+
+[params]
+  author = "humpty"
+  description = "Security Research & Analysis"
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "dracula"
+    lineNos = false
+    guessSyntax = true

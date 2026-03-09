@@ -1,0 +1,177 @@
+{{ define "main" }}
+<div class="case-detail active">
+  <div class="case-detail-main">
+    {{/* Case Header */}}
+    <div class="cd-header">
+      <a href="{{ "/" | relURL }}" class="cd-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Cases
+      </a>
+      <div class="cd-header-info">
+        <span class="case-id">{{ .Date.Format "CASE-2006-0102" }}</span>
+        <span class="sev-badge sev-{{ .Params.severity }}">{{ .Params.severity }}</span>
+        <span class="cd-title">{{ .Title }}</span>
+      </div>
+      <div class="cd-header-actions">
+        <button class="cd-btn" onclick="exportIOCs()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export IOCs
+        </button>
+        <button class="cd-btn" onclick="navigator.clipboard.writeText(window.location.href)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share
+        </button>
+        <button class="cd-btn-sidebar" id="toggle-detail-sidebar" title="Toggle sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+        </button>
+      </div>
+    </div>
+
+    {{/* Tabs */}}
+    <div class="cd-tabs">
+      <div class="cd-tab active" data-tab="investigation">Investigation</div>
+      <div class="cd-tab" data-tab="evidence">Evidence</div>
+      <div class="cd-tab" data-tab="mitre">MITRE ATT&CK</div>
+      <div class="cd-tab" data-tab="timeline">Timeline</div>
+    </div>
+
+    {{/* Tab Bodies */}}
+    <div class="cd-body">
+      {{/* Investigation Tab (the blog post) */}}
+      <div class="tab-content active" id="tab-investigation">
+        <div class="investigation-content">
+          <h1>{{ .Title }}</h1>
+          {{ .Content }}
+        </div>
+      </div>
+
+      {{/* Evidence Tab */}}
+      <div class="tab-content" id="tab-evidence">
+        <div class="evidence-header">
+          <h3>Indicators of Compromise</h3>
+          <div class="export-btns">
+            <button onclick="exportIOCs()">Export CSV</button>
+            <button>Export STIX</button>
+          </div>
+        </div>
+        {{ if .Params.iocs }}
+        <table class="evidence-table">
+          <thead>
+            <tr><th>Type</th><th>Value</th><th>Description</th><th></th></tr>
+          </thead>
+          <tbody>
+            {{ range .Params.iocs }}
+            <tr>
+              <td><span class="ioc-type-badge {{ .type | lower }}">{{ .type }}</span></td>
+              <td><span class="ioc-val">{{ .value }}</span></td>
+              <td style="color:var(--text2);font-size:12px">{{ .description }}</td>
+              <td><button class="copy-btn" onclick="navigator.clipboard.writeText('{{ .value }}');this.textContent='✓';setTimeout(()=>this.textContent='📋',1500)" title="Copy">📋</button></td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+        {{ else }}
+        <p style="color:var(--text3);font-style:italic;padding:20px">No IOCs documented for this case.</p>
+        {{ end }}
+      </div>
+
+      {{/* MITRE Tab */}}
+      <div class="tab-content" id="tab-mitre">
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:16px">Mapped MITRE ATT&CK Techniques</h3>
+        {{ if .Params.mitre }}
+        <div class="mitre-grid">
+          {{ range .Params.mitre }}
+          <div class="mitre-cell active">
+            <div class="tech-id">{{ . }}</div>
+            <div class="tech-name">{{ partial "mitre-name.html" . }}</div>
+          </div>
+          {{ end }}
+        </div>
+        {{ else }}
+        <p style="color:var(--text3);font-style:italic">No MITRE techniques mapped for this case.</p>
+        {{ end }}
+      </div>
+
+      {{/* Timeline Tab */}}
+      <div class="tab-content" id="tab-timeline">
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:16px">Investigation Timeline</h3>
+        <div class="timeline">
+          {{ range .Params.timeline }}
+          <div class="timeline-item">
+            <div class="tl-dot"></div>
+            <div class="tl-time">{{ .time }}</div>
+            <div class="tl-action">{{ .action }}</div>
+            <div class="tl-detail">{{ .detail }}</div>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{/* Right Sidebar */}}
+  <div class="case-detail-sidebar" id="detail-sidebar">
+    <div class="cds-section">
+      <h4>Case Details</h4>
+      <div class="cds-field"><span class="label">Created</span><span class="value">{{ .Date.Format "Jan 2, 2006" }}</span></div>
+      <div class="cds-field"><span class="label">Status</span><span class="value"><span class="status-badge status-{{ .Params.status | urlize }}"><span class="dot"></span>{{ .Params.status }}</span></span></div>
+      <div class="cds-field"><span class="label">Severity</span><span class="value"><span class="sev-badge sev-{{ .Params.severity }}">{{ .Params.severity }}</span></span></div>
+      <div class="cds-field"><span class="label">Category</span><span class="value">{{ .Params.category }}</span></div>
+      {{ with .Params.threat_actor }}
+      <div class="cds-field"><span class="label">Threat Actor</span><span class="value">{{ . }}</span></div>
+      {{ end }}
+      <div class="cds-field"><span class="label">Confidence</span><span class="value">{{ .Params.confidence | default "High" }}</span></div>
+      <div class="cds-field"><span class="label">TLP</span><span class="value">{{ .Params.tlp | default "WHITE" }}</span></div>
+      <div class="cds-field"><span class="label">Reading time</span><span class="value">{{ .ReadingTime }} min</span></div>
+    </div>
+
+    <div class="cds-section">
+      <h4>Tags</h4>
+      <div class="cds-tags">
+        {{ range .Params.tags }}
+        <span class="cds-tag">{{ . }}</span>
+        {{ end }}
+      </div>
+    </div>
+
+    {{ with .Params.related_cases }}
+    <div class="cds-section">
+      <h4>Related Cases</h4>
+      {{ range . }}
+      {{ $related := $.Site.GetPage (printf "/cases/%s" .) }}
+      {{ with $related }}
+      <a class="related-case-link" href="{{ .RelPermalink }}">{{ .Date.Format "CASE-2006-0102" }} — {{ .Title }}</a>
+      {{ end }}
+      {{ end }}
+    </div>
+    {{ end }}
+
+    <div class="cds-section">
+      <h4>Activity</h4>
+      <div class="cds-activity">
+        <div class="activity-item">
+          <div class="act-avatar">H</div>
+          <div><div class="act-text"><strong>humpty</strong> closed the case</div><div class="act-time">{{ .Date.Format "Jan 2, 2006" }}</div></div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar">H</div>
+          <div><div class="act-text"><strong>humpty</strong> published investigation</div><div class="act-time">{{ .Date.Format "Jan 2, 2006" }}</div></div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar">H</div>
+          <div><div class="act-text"><strong>humpty</strong> opened the case</div><div class="act-time">{{ .Date.AddDate 0 0 -3 | dateFormat "Jan 2, 2006" }}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function exportIOCs() {
+  const rows = document.querySelectorAll('.evidence-table .ioc-val');
+  if (!rows.length) return alert('No IOCs to export');
+  const text = Array.from(rows).map(r => r.textContent).join('\n');
+  navigator.clipboard.writeText(text).then(() => alert('IOCs copied to clipboard'));
+}
+</script>
+{{ end }}

@@ -1,0 +1,17 @@
+{{- $names := dict
+  "T1059" "Command & Scripting Interpreter"
+  "T1071" "Application Layer Protocol"
+  "T1140" "Deobfuscate/Decode Files"
+  "T1573" "Encrypted Channel"
+  "T1195" "Supply Chain Compromise"
+  "T1027" "Obfuscated Files or Information"
+  "T1056" "Input Capture"
+  "T1555" "Credentials from Password Stores"
+  "T1539" "Steal Web Session Cookie"
+  "T1082" "System Information Discovery"
+  "T1055" "Process Injection"
+  "T1497" "Virtualization/Sandbox Evasion"
+  "T1005" "Data from Local System"
+  "T1125" "Video Capture"
+-}}
+{{- index $names . | default "Technique" -}}
