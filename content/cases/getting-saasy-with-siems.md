@@ -1,6 +1,6 @@
 ---
 title: "Getting SaaSy with SIEMs — Introduction"
-date: 2024-09-01
+date: 2026-01-25
 severity: "info"
 status: "Closed"
 category: "SOC Engineering / Guides"
