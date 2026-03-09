@@ -1,0 +1,8 @@
+name = "SIEM Case Queue"
+license = "MIT"
+licenselink = "https://github.com/yourname/yourproject/blob/master/LICENSE"
+description = "A SIEM-inspired blog theme for security research"
+
+[author]
+  name = "humpty"
+  homepage = "https://c-b.io"
