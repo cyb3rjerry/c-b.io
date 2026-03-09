@@ -4,8 +4,8 @@ title = "c-b.io | RE // DFIR // CTF"
 theme = 'siem'
 
 [params]
-  author = "humpty"
-  description = "Security Research & Analysis"
+  author = "Humpty/Tony"
+  description = "Poking at binaries and chasing artifacts for shits and giggles."
 
 [taxonomies]
   tag = "tags"
