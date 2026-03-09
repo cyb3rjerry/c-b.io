@@ -1,0 +1,70 @@
+{{ define "main" }}
+<div class="main-inner" id="ioc-view">
+  <div class="queue-header slide-up">
+    <div class="queue-title">
+      <h1>IOC Database</h1>
+      {{ $total := 0 }}
+      {{ range where .Site.RegularPages "Section" "cases" }}
+        {{ $total = add $total (len (.Params.iocs | default slice)) }}
+      {{ end }}
+      <span class="count">{{ $total }}</span>
+    </div>
+    <div class="queue-controls">
+      <div class="filter-chips">
+        <button class="filter-chip active" data-ioc-filter="all">All</button>
+        <button class="filter-chip" data-ioc-filter="ip">IP</button>
+        <button class="filter-chip" data-ioc-filter="hash">Hash</button>
+        <button class="filter-chip" data-ioc-filter="domain">Domain</button>
+        <button class="filter-chip" data-ioc-filter="file">File</button>
+        <button class="filter-chip" data-ioc-filter="url">URL</button>
+        <button class="filter-chip" data-ioc-filter="package">Package</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="queue-table-wrap">
+    <table class="queue-table ioc-db-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Description</th>
+          <th>Source Case</th>
+          <th>Severity</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range (where .Site.RegularPages "Section" "cases").ByDate.Reverse }}
+          {{ $page := . }}
+          {{ range .Params.iocs }}
+          <tr class="ioc-row" data-type="{{ .type | lower }}">
+            <td><span class="ioc-type-badge {{ .type | lower }}">{{ .type }}</span></td>
+            <td><span class="ioc-val">{{ .value }}</span></td>
+            <td style="color:var(--text2);font-size:12px">{{ .description }}</td>
+            <td><a href="{{ $page.RelPermalink }}" class="ioc-case-link">{{ $page.Date.Format "CASE-2006-0102" }}</a></td>
+            <td><span class="sev-badge sev-{{ $page.Params.severity }}">{{ $page.Params.severity }}</span></td>
+            <td><button class="copy-btn" onclick="navigator.clipboard.writeText('{{ .value }}');this.textContent='Copied';setTimeout(()=>this.textContent='Copy',1500)" title="Copy">Copy</button></td>
+          </tr>
+          {{ end }}
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// IOC type filter
+document.querySelectorAll('[data-ioc-filter]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('[data-ioc-filter]').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const filter = chip.dataset.iocFilter;
+    document.querySelectorAll('.ioc-row').forEach(row => {
+      row.style.display = (filter === 'all' || row.dataset.type === filter) ? '' : 'none';
+    });
+  });
+});
+
+</script>
+{{ end }}

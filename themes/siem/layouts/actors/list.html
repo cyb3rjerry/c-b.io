@@ -1,0 +1,95 @@
+{{ define "main" }}
+<div class="main-inner" id="actors-view">
+  <div class="queue-header slide-up">
+    <div class="queue-title">
+      <h1>Threat Actors</h1>
+      {{/* Count unique actors */}}
+      {{ $actors := slice }}
+      {{ range where .Site.RegularPages "Section" "cases" }}
+        {{ with .Params.threat_actor }}
+          {{ $actors = $actors | append . }}
+        {{ end }}
+      {{ end }}
+      {{ $uniqueActors := $actors | uniq }}
+      <span class="count">{{ len $uniqueActors }}</span>
+    </div>
+  </div>
+
+  <div class="actors-grid">
+    {{/* Collect unique actors */}}
+    {{ $actors := slice }}
+    {{ range where .Site.RegularPages "Section" "cases" }}
+      {{ with .Params.threat_actor }}
+        {{ $actors = $actors | append . }}
+      {{ end }}
+    {{ end }}
+    {{ $uniqueActors := $actors | uniq | sort }}
+
+    {{ range $actor := $uniqueActors }}
+      {{/* Find all cases for this actor */}}
+      {{ $cases := slice }}
+      {{ $techniques := slice }}
+      {{ $iocCount := 0 }}
+      {{ $maxSev := "info" }}
+      {{ range where $.Site.RegularPages "Section" "cases" }}
+        {{ if eq .Params.threat_actor $actor }}
+          {{ $cases = $cases | append . }}
+          {{ range .Params.mitre }}
+            {{ $techniques = $techniques | append . }}
+          {{ end }}
+          {{ $iocCount = add $iocCount (len (.Params.iocs | default slice)) }}
+          {{/* Track highest severity */}}
+          {{ if eq .Params.severity "critical" }}{{ $maxSev = "critical" }}
+          {{ else if and (eq .Params.severity "high") (ne $maxSev "critical") }}{{ $maxSev = "high" }}
+          {{ else if and (eq .Params.severity "medium") (and (ne $maxSev "critical") (ne $maxSev "high")) }}{{ $maxSev = "medium" }}
+          {{ else if and (eq .Params.severity "low") (and (ne $maxSev "critical") (ne $maxSev "high") (ne $maxSev "medium")) }}{{ $maxSev = "low" }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      {{ $uniqueTech := $techniques | uniq }}
+
+      <div class="actor-card">
+        <div class="actor-card-header">
+          <div class="actor-avatar">{{ substr $actor 0 1 | upper }}</div>
+          <div class="actor-info">
+            <div class="actor-name">{{ $actor }}</div>
+            <div class="actor-stats">
+              <span>{{ len $cases }} {{ if eq (len $cases) 1 }}case{{ else }}cases{{ end }}</span>
+              <span class="actor-stat-sep">&middot;</span>
+              <span>{{ $iocCount }} IOCs</span>
+              <span class="actor-stat-sep">&middot;</span>
+              <span>{{ len $uniqueTech }} techniques</span>
+            </div>
+          </div>
+          <span class="sev-badge sev-{{ $maxSev }}">{{ $maxSev }}</span>
+        </div>
+
+        {{ if $uniqueTech }}
+        <div class="actor-section">
+          <div class="actor-section-label">MITRE ATT&CK</div>
+          <div class="mitre-chips">
+            {{ range $uniqueTech }}
+            <span class="mitre-chip">{{ . }}</span>
+            {{ end }}
+          </div>
+        </div>
+        {{ end }}
+
+        <div class="actor-section">
+          <div class="actor-section-label">Cases</div>
+          <div class="actor-cases">
+            {{ range $cases }}
+            <a href="{{ .RelPermalink }}" class="actor-case-row">
+              <span class="sev-badge sev-{{ .Params.severity }}" style="font-size:10px;padding:1px 6px">{{ .Params.severity }}</span>
+              <span class="case-id" style="font-size:11px">{{ .Date.Format "CASE-2006-0102" }}</span>
+              <span class="actor-case-title">{{ .Title }}</span>
+              <span class="date-text" style="margin-left:auto">{{ .Date.Format "2006-01-02" }}</span>
+            </a>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

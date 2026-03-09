@@ -1,0 +1,108 @@
+{{ define "main" }}
+<div class="main-inner" id="queue-view">
+  <div class="queue-header slide-up">
+    <div class="queue-title">
+      <h1>Cases</h1>
+      <span class="count" id="case-count">{{ len (where .Site.RegularPages "Section" "cases") }}</span>
+    </div>
+    <div class="queue-controls">
+      <div class="filter-chips">
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="open">Open</button>
+        <button class="filter-chip" data-filter="in-progress">In Progress</button>
+        <button class="filter-chip" data-filter="closed">Closed</button>
+      </div>
+      <div class="view-toggle">
+        <button class="active" id="btn-list-view" title="List view">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+        <button id="btn-card-view" title="Card view">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="queue-table-wrap" id="table-view">
+    <table class="queue-table">
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>Case ID</th>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Category</th>
+          <th>Threat Actor</th>
+          <th>MITRE</th>
+          <th>Created</th>
+          <th>Assignee</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .Pages.ByDate.Reverse }}
+        <tr class="case-row"
+            data-status="{{ .Params.status }}"
+            data-severity="{{ .Params.severity }}"
+            data-url="{{ .RelPermalink }}"
+            data-title="{{ .Title }}"
+            data-iocs="{{ range .Params.iocs }}{{ .value }} {{ end }}"
+            onclick="window.location='{{ .RelPermalink }}'">
+          <td><span class="sev-badge sev-{{ .Params.severity }}">{{ .Params.severity }}</span></td>
+          <td><span class="case-id">{{ .Date.Format "CASE-2006-0102" }}</span></td>
+          <td><span class="case-title-cell">{{ .Title }}</span></td>
+          <td>
+            <span class="status-badge status-{{ .Params.status | urlize }}">
+              <span class="dot"></span>{{ .Params.status }}
+            </span>
+          </td>
+          <td><span class="category-text">{{ .Params.category }}</span></td>
+          <td><span class="actor-text">{{ .Params.threat_actor | default "N/A" }}</span></td>
+          <td>
+            <div class="mitre-chips">
+              {{ range .Params.mitre }}
+              <span class="mitre-chip">{{ . }}</span>
+              {{ end }}
+            </div>
+          </td>
+          <td><span class="date-text">{{ .Date.Format "2006-01-02" }}</span></td>
+          <td>
+            <div class="assignee-cell">
+              <div class="avatar-sm">H</div>
+              <span style="font-size:12px;color:var(--text2)">{{ $.Site.Params.author }}</span>
+            </div>
+          </td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="queue-cards" id="card-view">
+    {{ range .Pages.ByDate.Reverse }}
+    <a href="{{ .RelPermalink }}" class="case-card" data-status="{{ .Params.status }}" data-severity="{{ .Params.severity }}" data-iocs="{{ range .Params.iocs }}{{ .value }} {{ end }}">
+      <div class="sev-strip {{ .Params.severity }}"></div>
+      <div class="case-card-inner">
+        <div class="case-card-top">
+          <span class="case-id">{{ .Date.Format "CASE-2006-0102" }}</span>
+          <span class="sev-badge sev-{{ .Params.severity }}">{{ .Params.severity }}</span>
+        </div>
+        <div class="case-card-title">{{ .Title }}</div>
+        <div class="case-card-meta">
+          <span class="status-badge status-{{ .Params.status | urlize }}"><span class="dot"></span>{{ .Params.status }}</span>
+          <span class="category-text">{{ .Params.category }}</span>
+        </div>
+        <div class="case-card-excerpt">{{ .Summary | plainify | truncate 150 }}</div>
+        <div class="case-card-footer">
+          <span class="date-text">{{ .Date.Format "2006-01-02" }}</span>
+          <div class="mitre-chips">
+            {{ range first 3 .Params.mitre }}
+            <span class="mitre-chip">{{ . }}</span>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+    </a>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

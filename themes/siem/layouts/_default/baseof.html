@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} — {{ .Site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+  <meta name="base-url" content="{{ "/" | relURL }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ "css/siem.css" | relURL }}">
+</head>
+<body>
+  {{/* Loading overlay */}}
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="load-text">Initializing SIEM Console...</div>
+  </div>
+
+  {{ partial "topbar.html" . }}
+  {{ partial "sidebar.html" . }}
+
+  <div class="main" id="main-content">
+    {{ block "main" . }}{{ end }}
+  </div>
+
+  {{/* Image lightbox */}}
+  <div class="lightbox-overlay" id="lightbox">
+    <img src="" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <script src="{{ "js/siem.js" | relURL }}"></script>
+</body>
+</html>
