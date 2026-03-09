@@ -1,6 +1,6 @@
 baseURL = 'https://c-b.io/'
 languageCode = 'en-us'
-title = "c-b.io | Research SIEM"
+title = "c-b.io | RE // DFIR // CTF"
 theme = 'siem'
 
 [params]

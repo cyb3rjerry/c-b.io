@@ -1,5 +1,5 @@
 ---
-title: "c-b.io | Research SIEM"
+title: "c-b.io | RE // DFIR // CTF"
 ---
 
 Hey there! Glad to see you here. I go by Humpty, some know me by Tony. This blog aims at documenting my Reverse Engineering journey as I stumble my way through malware.
