@@ -2,7 +2,7 @@
 title: "c-b.io | RE // DFIR // CTF"
 ---
 
-Hey there! Glad to see you here. I go by Humpty, some know me by Tony. This blog aims at documenting my Reverse Engineering journey as I stumble my way through malware.
+Hey there! Glad to see you here. I go by Humpty, some know me by Tony. This blog aims at documenting my Reverse Engineering & DFIR journey as I stumble my way through malware and funky logs.
 
 I also run a small DFIR community! You can learn more by going to [irchaos.club](https://irchaos.club) or by joining our Discord server at the link below.
 
