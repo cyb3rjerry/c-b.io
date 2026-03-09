@@ -1,0 +1,57 @@
+{{ define "main" }}
+<div class="main-inner" id="mitre-view">
+  <div class="queue-header slide-up">
+    <div class="queue-title">
+      <h1>MITRE ATT&CK Matrix</h1>
+      {{/* Collect all unique techniques */}}
+      {{ $allTech := slice }}
+      {{ range where .Site.RegularPages "Section" "cases" }}
+        {{ range .Params.mitre }}
+          {{ $allTech = $allTech | append . }}
+        {{ end }}
+      {{ end }}
+      {{ $uniqueTech := $allTech | uniq }}
+      <span class="count">{{ len $uniqueTech }} techniques</span>
+    </div>
+  </div>
+
+  {{/* Build technique -> cases mapping */}}
+  <div class="mitre-matrix-grid">
+    {{ $allTech := slice }}
+    {{ range where .Site.RegularPages "Section" "cases" }}
+      {{ range .Params.mitre }}
+        {{ $allTech = $allTech | append . }}
+      {{ end }}
+    {{ end }}
+    {{ $uniqueTech := $allTech | uniq | sort }}
+
+    {{ range $tech := $uniqueTech }}
+      {{/* Count how many cases reference this technique */}}
+      {{ $cases := slice }}
+      {{ range where $.Site.RegularPages "Section" "cases" }}
+        {{ if in .Params.mitre $tech }}
+          {{ $cases = $cases | append . }}
+        {{ end }}
+      {{ end }}
+      <div class="mitre-matrix-card" data-count="{{ len $cases }}">
+        <div class="mmc-header">
+          <span class="mmc-id">{{ $tech }}</span>
+          <span class="mmc-count">{{ len $cases }} {{ if eq (len $cases) 1 }}case{{ else }}cases{{ end }}</span>
+        </div>
+        <div class="mmc-name">{{ partial "mitre-name.html" $tech }}</div>
+        <div class="mmc-cases">
+          {{ range $cases }}
+          <a href="{{ .RelPermalink }}" class="mmc-case-link">
+            <span class="sev-badge sev-{{ .Params.severity }}" style="font-size:10px;padding:1px 6px">{{ .Params.severity }}</span>
+            <span class="mmc-case-title">{{ .Title }}</span>
+          </a>
+          {{ end }}
+        </div>
+        <div class="mmc-bar">
+          <div class="mmc-bar-fill" style="width:{{ mul (len $cases) 20 }}%"></div>
+        </div>
+      </div>
+    {{ end }}
+  </div>
+</div>
+{{ end }}
