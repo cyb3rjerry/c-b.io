@@ -1,5 +1,5 @@
 ---
-title: "When your tests are leaking information. A tale of S3 bucket abuse!"
+title: "does-not-exist-bucket exists now and it's mine"
 date: 2026-03-28
 severity: "info"
 status: "Closed"
@@ -7,7 +7,7 @@ category: "SOC Engineering / Guides"
 threat_actor: ""
 confidence: ""
 tlp: "WHITE"
-tags: ["SIEM", "SOC", "AWS", "logs", "detection-engineering"]
+tags: ["SIEM", "SOC", "AWS", "S3", "CloudTrail", "Terraform", "detection-engineering"]
 mitre: []
 iocs: []
 timeline:
@@ -17,8 +17,6 @@ timeline:
 related_cases: ["vulnerability-research"]
 cover: /images/s3-squatting/bucket-logo.jpg
 ---
-
-# WatchTowr made me wanna mess with S3 again
 
 As someone who's got the great misfortune of working very closely with Cloud providers (namely AWS, Azure & GCP, the unholy trinity) I'm well aware that there's a bunch of stuff that's vulnerable out there for various reasons.
 
