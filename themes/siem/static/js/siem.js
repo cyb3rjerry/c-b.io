@@ -11,6 +11,40 @@ if (sidebarBtn) {
   sidebarBtn.addEventListener('click', () => sidebar.classList.toggle('expanded'));
 }
 
+// Mobile hamburger menu
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+if (hamburgerBtn && sidebar) {
+  hamburgerBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('mobile-open');
+    document.body.classList.toggle('sidebar-open');
+  });
+}
+
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener('click', () => {
+    sidebar.classList.remove('mobile-open');
+    document.body.classList.remove('sidebar-open');
+  });
+}
+
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('mobile-open');
+      document.body.classList.remove('sidebar-open');
+    }
+  });
+});
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    sidebar.classList.remove('mobile-open');
+    document.body.classList.remove('sidebar-open');
+  }
+});
+
 // Notification dropdown
 const notifBtn = document.getElementById('notif-btn');
 const notifDrop = document.getElementById('notif-dropdown');
