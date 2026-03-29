@@ -15,7 +15,7 @@ timeline:
   - { time: "Mar 21, 2026", action: "I realized I should write about this", detail: "Considering I work in a cloud centric company and know a thing or two about AWS, maybe I should talk about this from another perspective." }
   - { time: "Mar 28, 2026", action: "I realize I still haven't done it", detail: "Procrastination has hit hard on this one, finally decided to get my head out my ass."}
 related_cases: ["vulnerability-research"]
-cover: /images/s3-squatting/bucket-logo.jpg
+cover: /images/s3-squatting/cover.jpg
 ---
 
 As someone who's got the great misfortune of working very closely with Cloud providers (namely AWS, Azure & GCP, the unholy trinity) I'm well aware that there's a bunch of stuff that's vulnerable out there for various reasons.
