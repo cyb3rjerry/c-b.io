@@ -1,5 +1,6 @@
 ---
 title: "does-not-exist-bucket exists now and it's mine"
+description: "Developers forget to mock S3 calls, the bucket gets squatted. S3 bucket squatting, CloudTrail blind spots and why data events cost more than your rent."
 date: 2026-03-28
 severity: "info"
 status: "Closed"

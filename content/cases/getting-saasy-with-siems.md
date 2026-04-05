@@ -1,5 +1,6 @@
 ---
 title: "Getting SaaSy with SIEMs — Introduction"
+description: "A field guide to SaaS audit log analysis for SOC analysts who just got handed an ELK stack full of Workday and Jira logs with zero documentation."
 date: 2026-01-25
 severity: "info"
 status: "Closed"

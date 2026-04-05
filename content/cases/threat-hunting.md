@@ -1,5 +1,6 @@
 ---
 title: "Threat hunting for shits and giggles"
+description: "Finding hackers with terrible OpSec through exposed open directories. SSH keys, CobaltStrike configs and debug-rich malware just sitting on the internet."
 date: 2024-07-14
 severity: "low"
 status: "Closed"
