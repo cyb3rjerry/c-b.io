@@ -389,7 +389,9 @@ And after a bit (once the service start failing) we get someone freaking out ove
 # So what did the SOC see?
 
 Pretty much nothing. As we stated earlier, much of our visibility has effectively been nuked by the fact we don't monitor data events. 
+
 > But wasn't the `ListBuckets` event a management event
+
 Well yes it is but making a detection rule trigger on this event will be pretty unreliable. If you enable an alert on this you'll essentially have to figure out a gigantic allow list for all profiles who are known to do this OR you'll have to set a treshold (say `n` consecutive calls in `x` amount of time) which will also be unreliable as it's fairly easy to stay under any threshold (by doing it once and caching the result). This leaves us in a kind of weird spot.
 
 If we pivot to our SIEM we can however notice something interesting. ✨ Something ✨ still happened! We seen a shit ton of `Decrypt` events and some `GenerateDataKey` sprinkled throughout.
