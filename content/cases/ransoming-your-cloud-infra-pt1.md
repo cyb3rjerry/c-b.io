@@ -106,7 +106,7 @@ What we're _not_ monitoring however is data events. No S3 `GetObject`/`PutObject
 
 # The Skid Attack
 
-For this scenario, let's assume you're a skid that managed to pop an app somehow. You've put your hands on an access key whose associated role has a policy like this:
+For this scenario, let's assume you're a skid that managed to pop an app somehow and you're ok with encrypting the only bucket it has access to (remember, we're a skid here). You've put your hands on an access key whose associated role has a policy like this:
 
 ```hcl
 {
@@ -157,7 +157,7 @@ You might be wondering how we actually get rid of the old versions. When version
 
 To permanently remove a specific version, you need to pass a `VersionId` to your delete call. And to know which versions exist, you need to call `ListObjectVersions` which gives you back every version of every object in the bucket along with their `VersionId`. Once you have those, you can pass them to `DeleteObjects` in batches of 1000 to permanently remove them.
 
-Here's where it gets interesting. You'd think that permanently deleting a versioned object would at least generate a management event right? Something the SOC could catch? Nope. Even though `s3:DeleteObjectVersion` is a separate IAM permission from `s3:DeleteObject`[^8], they both use the exact same `DeleteObject` API call under the hood. The only difference is whether you include a `versionId` parameter or not. And CloudTrail logs both as the same `DeleteObject` event name, which is classified as a data event[^5]. There is no separate `DeleteObjectVersion` event in CloudTrail. It simply doesn't exist.
+Now you'd think that permanently deleting a versioned object would at least generate a management event right? Something the SOC could catch? Nope. Even though `s3:DeleteObjectVersion` is a separate IAM permission from `s3:DeleteObject`[^8], they both use the exact same `DeleteObject` API call under the hood. The only difference is whether you include a `versionId` parameter or not. And CloudTrail logs both as the same `DeleteObject` event name, which is classified as a data event[^5]. There is no separate `DeleteObjectVersion` event in CloudTrail. It simply doesn't exist.
 
 So let's recap what our SOC would actually see for this entire attack:
 
@@ -211,7 +211,9 @@ def generate_key():
 
 
 def list_buckets(s3_client):
-    resp = s3_client.list_buckets()
+    # Skid approach, there's obviously better ways of
+    # validating what we have access to
+    resp = s3_client.list_buckets() 
     buckets = [b["Name"] for b in resp.get("Buckets", [])]
     print(f"found {len(buckets)} buckets")
     for b in buckets:
@@ -386,13 +388,15 @@ Pretty much nothing. As we stated earlier, much of our visibility has effectivel
 > But wasn't the `ListBuckets` event a management event
 Well yes it is but making a detection rule trigger on this event will be pretty unreliable. If you enable an alert on this you'll essentially have to figure out a gigantic allow list for all profiles who are known to do this OR you'll have to set a treshold (say `n` consecutive calls in `x` amount of time) which will also be unreliable as it's fairly easy to stay under any threshold (by doing it once and caching the result). This leaves us in a kind of weird spot.
 
-The `GetObject` and `PutObject` calls that did all the heavy lifting? Data events. Not monitored. The `DeleteObject` and `DeleteObjects` calls that nuked all previous versions? Also data events[^5]. The entire kill chain from enumeration to encryption to version deletion operates exclusively in the data plane. Without S3 data event logging, the SOC literally has no record of any of it happening.
-
 If we pivot to our SIEM we can however notice something interesting. ✨ Something ✨ still happened! We seen a shit ton of `Decrypt` events and some `GenerateDataKey` sprinkled throughout.
 
 ![](/images/ransoming-your-cloud-infra-pt1/decrypt_events.png)
 
-Why is that? Well remember, some of our buckets use SSE-KMS for encryption at rest. When our script does a `GetObject` on one of those buckets, S3 needs to decrypt the object before handing it back to us. To do that, it calls `kms:Decrypt` behind the scenes to unwrap the data key that was used to encrypt the object. We don't call KMS ourselves, S3 does it on our behalf. Same thing on the write side: when we `PutObject` an encrypted file back into a KMS-encrypted bucket, S3 calls `kms:GenerateDataKey` to get a fresh data key for encrypting the new object at rest. Both of these show up as management events in CloudTrail.
+Why is that? Well remember, some of our buckets use SSE-KMS for encryption at rest. When our script does a `GetObject` on one of those buckets, S3 needs to decrypt the object before handing it back to us. To do that, it calls `kms:Decrypt` behind the scenes to unwrap the data key that was used to encrypt the object. 
+
+> Well Tony, wouldn't you see the IP address or a weird user-agent on those Decrypt calls?
+
+Simply put, no. We don't call KMS ourselves, S3 does it on our behalf. Same thing on the write side: when we `PutObject` an encrypted file back into a KMS-encrypted bucket, S3 calls `kms:GenerateDataKey` to get a fresh data key for encrypting the new object at rest. Both of these show up as management events in CloudTrail.
 
 These events will typically look like these:
 
@@ -451,15 +455,115 @@ These events will typically look like these:
   "eventCategory": "Management"
 }
 ```
-So this does give us a bit of context. Sadly though, since the event stems from AWS decrypt events stem from AWS itself, we don't get any meaningful IOCs (IP address, user-agent). We could probably establish some form of pattern of life for our apps and establish a treshold for how many of these read/write events are expected and we could then set a threshold. Then again, it's not a GREAT way of detecting these events but it's definitely better than nothing. One thing worth highlighting is that despite those not making great _detection_ events, they sure as shit can come in handy when doing forensic analysis without data events. Identifying large spike of these events retroactively isn't too complicated.
+So this does give us a bit of context. Sadly though, since the decrypt events stem from AWS itself, we don't get any meaningful IOCs (IP address, user-agent). We could probably establish some form of pattern of life for our apps and establish a treshold for how many of these read/write events are expected and we could then set a threshold. Then again, it's not a GREAT way of detecting these events but it's definitely better than nothing. One thing worth highlighting is that despite those not making great _detection_ events, they sure as shit can come in handy when doing forensic analysis without data events. Identifying large spike of these events retroactively isn't too complicated.
 
 Now all this is fine and dandy but after review my logs, I noticed something peculiar. I had less than 5000 decrypt events while over 52000 objects had been read. Why is that?
 
-Remember the `bucket_key_enabled = true` in our Terraform config? That's **S3 Bucket Keys** (which has been the default since 2023[^6]). When this is on, S3 generates a short-lived bucket-level key from KMS and caches it. That cached key then creates data keys locally for a bunch of objects without going back to KMS each time. AWS says this reduces KMS API calls by up to 99%[^6]. So instead of 53,000 `kms:Decrypt` calls for 53,000 objects, you get a few thousand at most. The exact cache duration isn't documented either, AWS just calls it "short-lived" and "time-limited."
+Remember the `bucket_key_enabled = true` in our Terraform config? That's **S3 Bucket Keys** (which is now the default for new buckets[^6]). When this is on, S3 generates a short-lived bucket-level key from KMS and caches it. That cached key then creates data keys locally for a bunch of objects without going back to KMS each time. AWS says this reduces KMS API calls by up to 99%[^6]. So instead of 53,000 `kms:Decrypt` calls for 53,000 objects, you get a few thousand at most. The exact cache duration isn't documented either, AWS just calls it "short-lived" and "time-limited."
 
 Without Bucket Keys (legacy setups), S3 _does_ call KMS for every single object[^7]. That would generate a noticeable spike in KMS events. But even then, `kms:Decrypt` and `kms:GenerateDataKey` are completely normal S3 operations that happen millions of times a day in any active AWS account. You'd need a very specific detection rule to distinguish "app doing normal reads/writes" from "attacker encrypting everything in sight." And most SOC teams don't have that rule.
 
 So the only management events our attack generated were a single `ListBuckets` call and a handful of KMS `Decrypt`/`GenerateDataKey` calls that S3 made on our behalf. The ListBuckets is buried in noise, and the KMS events look identical to normal app activity. Not exactly a smoking gun.
+
+# Home grown tripwires
+
+Now obviously the "better" fix here is highly dependent on the stack and how it works. We could arguable enforce S3 [Object Locks](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html), deny `DeleteObjectVersion` through an [SCP](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html) and/or enforce cross-account replication of our data but that will vary too much from company to company so I won't dig into this in this blogpost.
+
+What we can do however is deploy some **tripwires**. What we've done in my [S3 Squatting](/cases/s3-squatting/) blogpost to detect public reads against S3 buckets can also be done at a very low cost "privately".
+
+## The cheap version
+
+The idea is simple: deploy a handful of buckets that _look_ like they belong in the environment but that no legitimate service should ever touch. Name them something an attacker doing `ListBuckets` would absolutely want to hit:
+
+```hcl
+locals {
+  canary_buckets = toset([
+    "acmecorp-prod-billing-exports-us-east-1",
+    "acmecorp-prod-pii-archive-us-east-1",
+    "acmecorp-prod-secrets-backup-us-east-1",
+  ])
+}
+
+# deploy the canary buckets. keep them private, no objects needed.
+# the mere act of someone listing objects or reading from these
+# is suspicious since nothing legitimate should be touching them.
+resource "aws_s3_bucket" "canary" {
+  for_each = local.canary_buckets
+  bucket   = each.key
+}
+
+resource "aws_s3_bucket_public_access_block" "canary" {
+  for_each = local.canary_buckets
+  bucket   = aws_s3_bucket.canary[each.key].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+```
+
+Then set up a CloudTrail trail that only monitors data events on these canary buckets. Same pattern from my [S3 squatting post](/cases/s3-squatting/) but pointed inward:
+
+```hcl
+resource "aws_cloudtrail" "canary_tripwire" {
+  name                          = "canary-tripwire-trail"
+  s3_bucket_name                = aws_s3_bucket.log_bucket.id
+  include_global_service_events = false
+  is_multi_region_trail         = false
+  enable_log_file_validation    = true
+
+  advanced_event_selector {
+    name = "S3DataEventsForCanaryBuckets"
+
+    field_selector {
+      field  = "eventCategory"
+      equals = ["Data"]
+    }
+
+    field_selector {
+      field  = "resources.type"
+      equals = ["AWS::S3::Object"]
+    }
+
+    field_selector {
+      // only monitor our canary buckets, keeps the cost at basically zero
+      // since no legitimate traffic should ever hit these
+      field       = "resources.ARN"
+      starts_with = [for b in aws_s3_bucket.canary : "${b.arn}/"]
+    }
+  }
+
+  depends_on = [aws_s3_bucket_policy.log_bucket]
+}
+```
+
+The cost of this is essentially zero. No legitimate traffic means no data events, which means no CloudTrail charges. But the moment someone runs `ListObjectsV2`, `GetObject`, or `PutObject` against one of these buckets, you've got a data event with their identity, IP, and user agent. Any event on these buckets is suspicious by definition so your detection rule is dead simple: if event exists, alert.
+
+If we want to improve onto this even more and give us the best odds of catching this early, we can abuse the fact that `ListBuckets` returns buckets in alphabetical order (thanks @rad for pointing this out to me). Think about it: our skid script calls `ListBuckets`, gets back a sorted list, then iterates through them one by one. If your canary bucket sorts near the top of that list, it gets hit _before_ the attacker even starts on the real buckets. S3 bucket names can start with numbers and numbers sort before letters, so something like `0000-acmecorp-prod-billing-exports-us-east-1` will (most likely) always be the very first bucket in the list regardless of what other buckets exist in the account. Your tripwire fires while the attacker is still enumerating, giving you a head start on response before any real data gets encrypted.
+
+Knowing that our fake bucket is never meant to be interacted with and that no applications use it, it's now much easier to leverage some early detection rules based on the events produced by our decoy bucket.
+
+## The paid approach (for my corpo readers out there)
+
+> WARNING: This is the part where I'll be shilling for a product I love despite not being paid to do so
+> If you wanna skip this part, I get it.
+
+Now for my corpo friends reading this you're probably going "bruuuuh I don't wanna maintain all this shit 😭" which is absolutely fair. Canary buckets are great until the person who deployed them leaves the company and nobody knows they exist, the trail stops getting monitored, or someone accidentally deletes the Terraform stack in a cleanup sprint. Home grown tripwires work but they need babysitting.
+
+Products like [Tracebit](https://tracebit.com/) handle this for you. They deploy decoy resources across your AWS accounts (S3 buckets, IAM roles, credentials, the works) and alert when anything touches them. Same concept as what we just built but they handle the deployment, rotation and alerting so it doesn't slowly rot in a repo somewhere. What's nice is they can spread canaries across hundreds of accounts in minutes and the detection is near real-time since they're not waiting on CloudTrail's 5 minute publishing cycle. They also rotate and refresh the decoys automatically so your canaries don't go stale, which is the part that always falls apart when you DIY it.
+
+At the end of the day, relying on "we'll notice the outage" as your detection strategy for cloud ransomware is not a plan.
+
+# Final words
+
+So what should you actually do about this? Two things stood out to me while writing this.
+
+First, the decoy buckets. We showed that deploying a few canary buckets with a scoped CloudTrail trail costs you literally nothing and takes maybe 20 minutes to set up in Terraform. Name one 0-something so it sorts first in ListBuckets and any script that iterates through your account will trip on it before touching the real stuff. Is it bulletproof? No. But it's free, it's easy and it gives you a signal you currently don't have at all.
+
+Second, those KMS Decrypt and GenerateDataKey events. They were the only management events this attack left behind (other than a single ListBuckets call that's impossible to alert on). Right now most of you probably aren't doing anything with these. Start baselining them. Figure out what normal looks like for each role in your account. How many Decrypt calls does `acmecorp-prod-api-task-role` usually make in a day? If that number suddenly spikes from 200 to 5000 in an hour, something is probably wrong. It's not a perfect detection by any stretch but it's a hell of a lot better than finding out you got ransomed because your app started throwing errors.
+
+Part 2 will be less friendly ❤️
 
 ---
 
