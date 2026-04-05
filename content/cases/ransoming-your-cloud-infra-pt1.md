@@ -149,6 +149,8 @@ In practice this means same-region EC2-to-S3 transfers can hit up to 100 Gbps on
 4. Re-upload the now encrypted file (once again, another unmonitored Data event)
 5. Delete all old object versions only after the encryption is done. Here's the fun part: `DeleteObject` and `DeleteObjects` are also data events[^5], not management events. The whole thing lives in the data plane. Without S3 data event logging enabled, the SOC sees absolutely nothing. Zero. Nada.
 
+![](/images/ransoming-your-cloud-infra-pt1/execution_flow.png)
+
 ### A quick note on deleting versions
 
 You might be wondering how we actually get rid of the old versions. When versioning is enabled, a normal `DeleteObject` call doesn't actually delete anything, it just slaps a delete marker on top. The object is still there, all previous versions are still there, and the victim can restore everything.
