@@ -15,7 +15,7 @@ timeline:
   - { time: "Apr 4, 2026", action: "Started writing about cloud ransomware", detail: "There's barely any research on ransoming cloud infra, figured I'd put something together from a practical perspective." }
   - { time: "Apr 5, 2026", action: "Ran the skid attack against ACME Corp lab", detail: "Encrypted 53K objects in a single bucket, observed KMS events in CloudTrail, documented the blind spots." }
 related_cases: ["vulnerability-research", "s3-squatting"]
-cover: /images/ransoming-your-cloud-infra-pt1/ransom-cover.jpg
+cover: /images/ransoming-your-cloud-infra-pt1/ransom-cover.png
 ---
 
 # Preface
