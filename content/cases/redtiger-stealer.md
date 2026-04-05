@@ -1,5 +1,6 @@
 ---
 title: "Analyzing the RedTiger Malware Stealer"
+description: "Tearing apart RedTiger, a Python stealer going after Discord tokens, browser creds and Roblox accounts through DPAPI decryption and Discord webhook exfil."
 date: 2024-06-10
 severity: "medium"
 status: "Closed"

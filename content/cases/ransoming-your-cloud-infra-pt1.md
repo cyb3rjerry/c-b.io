@@ -1,5 +1,6 @@
 ---
 title: "Cloudy With A Chance Of Compromise: How A Skid Ransoms Your Buckets"
+description: "Encrypting 250GB of S3 data with basic app permissions and barely leaving a trace. The skid approach to cloud ransomware and why your SOC probably wouldn't catch it."
 date: 2026-04-04
 severity: "high"
 status: "Open"

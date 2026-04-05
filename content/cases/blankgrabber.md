@@ -1,5 +1,6 @@
 ---
 title: "Dissecting a fresh BlankGrabber sample"
+description: "Picking apart a fresh BlankGrabber sample. PyInstaller packed, ZLIB compressed, and surprisingly undocumented at the loader level."
 date: 2024-05-22
 severity: "medium"
 status: "Closed"

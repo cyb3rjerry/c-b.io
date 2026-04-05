@@ -1,5 +1,6 @@
 ---
 title: "Supper is served"
+description: "Analyzing Supper (Interlock RAT), a Vanilla Tempest/Vice Society backdoor that most reports got wrong or barely covered."
 date: 2024-08-15
 severity: "critical"
 status: "Closed"
