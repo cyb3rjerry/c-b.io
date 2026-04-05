@@ -393,6 +393,7 @@ body{overflow:auto;height:auto}
 .investigation-content table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
 .investigation-content table th,.investigation-content table td{white-space:nowrap}
 
+
 /* Topbar: not fixed, scrolls with content */
 .topbar{position:relative;height:auto;min-height:var(--topbar-h);padding:8px 12px;gap:8px}
 .topbar-logo{min-width:unset}
