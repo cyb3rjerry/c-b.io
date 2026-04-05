@@ -353,19 +353,88 @@ To whatever this garbage is
 ![](/images/ransoming-your-cloud-infra-pt1/post-ransom.png)
 
 And after a bit (once the service start failing) we get someone freaking out over this:
-![](/images/ransoming-your-cloud-infra-pt1/post-ransom.png)
+![](/images/ransoming-your-cloud-infra-pt1/ransom-note.png)
 
-## So what did the SOC see?
+# So what did the SOC see?
 
-Pretty much nothing. The `GetObject` and `PutObject` calls that did all the heavy lifting? Data events. Not monitored. The `ListObjectsV2` to enumerate targets? Data event. The `DeleteObject` and `DeleteObjects` calls that nuked all previous versions? Also data events[^14]. The entire kill chain from enumeration to encryption to version deletion operates exclusively in the data plane. Without S3 data event logging, the SOC literally has no record of any of it happening.
+Pretty much nothing. As we stated earlier, much of our visibility has effectively been nuked by the fact we don't monitor data events. 
+> But wasn't the `ListBuckets` event a management event
+Well yes it is but making a detection rule trigger on this event will be pretty unreliable. If you enable an alert on this you'll essentially have to figure out a gigantic allow list for all profiles who are known to do this OR you'll have to set a treshold (say `n` consecutive calls in `x` amount of time) which will also be unreliable as it's fairly easy to stay under any threshold (by doing it once and caching the result). This leaves us in a kind of weird spot.
 
-"But wait, the buckets are KMS-encrypted! Surely all those `kms:Decrypt` and `kms:GenerateDataKey` calls would light up like a Christmas tree?" Yeah, that's what I thought too. Turns out, not really.
+The `GetObject` and `PutObject` calls that did all the heavy lifting? Data events. Not monitored. The `DeleteObject` and `DeleteObjects` calls that nuked all previous versions? Also data events[^14]. The entire kill chain from enumeration to encryption to version deletion operates exclusively in the data plane. Without S3 data event logging, the SOC literally has no record of any of it happening.
+
+If we pivot to our SIEM we can however notice something interesting. ✨ Something ✨ still happened! We seen a shit ton of `Decrypt` events and some `GenerateDataKey` sprinkled throughout.
+
+![](/images/ransoming-your-cloud-infra-pt1/decrypt_events.png)
+
+Why is that? Well remember, some of our buckets use SSE-KMS for encryption at rest. When our script does a `GetObject` on one of those buckets, S3 needs to decrypt the object before handing it back to us. To do that, it calls `kms:Decrypt` behind the scenes to unwrap the data key that was used to encrypt the object. We don't call KMS ourselves, S3 does it on our behalf. Same thing on the write side: when we `PutObject` an encrypted file back into a KMS-encrypted bucket, S3 calls `kms:GenerateDataKey` to get a fresh data key for encrypting the new object at rest. Both of these show up as management events in CloudTrail because they're KMS control plane operations.
+
+These events will typically look like these:
+
+```json
+{
+  "userIdentity": {
+    "type": "AssumedRole", // <--- our compromised ECS task role
+    "principalId": "AROA3XYZEXAMPLE12345:1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "arn": "arn:aws:sts::123456789012:assumed-role/acmecorp-prod-api-task-role/...",
+    "accessKeyId": "ASIAXVUF3M3KZJRGR37F", // <--- ASIA prefix = temporary creds (STS)
+    "invokedBy": "fas.s3.amazonaws.com" // <--- S3 made this KMS call on our behalf, not us directly
+  },
+  "eventName": "Decrypt", // <--- S3 decrypting the object so it can hand us the plaintext
+  "sourceIPAddress": "fas.s3.amazonaws.com",
+  "requestParameters": {
+    "encryptionContext": {
+      "aws:s3:arn": "arn:aws:s3:::acmecorp-prod-customer-data-lake-us-east-1" // <--- which bucket triggered this
+    },
+    "encryptionAlgorithm": "SYMMETRIC_DEFAULT"
+  },
+  "resources": [
+    {
+      "type": "AWS::KMS::Key",
+      "ARN": "arn:aws:kms:us-east-1:123456789012:key/cc36a069-..."
+    }
+  ],
+  "managementEvent": true, // <--- this IS a management event, so we can see it
+  "eventCategory": "Management"
+}
+```
+```json
+{
+  "userIdentity": {
+    "type": "AssumedRole",
+    "principalId": "AROA3XYZEXAMPLE12345:1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "arn": "arn:aws:sts::123456789012:assumed-role/acmecorp-prod-api-task-role/...",
+    "accessKeyId": "ASIAXVUF3M3K5H4CK22Z",
+    "invokedBy": "fas.s3.amazonaws.com"
+  },
+  "eventName": "GenerateDataKey", // <--- S3 generating a new data key for encrypting our PutObject at rest
+  "sourceIPAddress": "fas.s3.amazonaws.com",
+  "requestParameters": {
+    "keyId": "alias/aws/s3", // <--- using the default aws/s3 managed key
+    "encryptionContext": {
+      "aws:s3:arn": "arn:aws:s3:::acmecorp-prod-customer-data-lake-us-east-1"
+    },
+    "keySpec": "AES_256" // <--- AES-256 data key
+  },
+  "resources": [
+    {
+      "type": "AWS::KMS::Key",
+      "ARN": "arn:aws:kms:us-east-1:123456789012:key/cc36a069-..."
+    }
+  ],
+  "managementEvent": true,
+  "eventCategory": "Management"
+}
+```
+So this does give us a bit of context. Sadly though, since the event stems from AWS decrypt events stem from AWS itself, we don't get any meaningful IOCs (IP address, user-agent). We could probably establish some form of pattern of life for our apps and establish a treshold for how many of these read/write events are expected and we could then set a threshold. Then again, it's not a GREAT way of detecting these events but it's definitely better than nothing. One thing worth highlighting is that despite those not making great _detection_ events, they sure as shit can come in handy when doing forensic analysis without data events. Identifying large spike of these events retroactively isn't too complicated.
+
+Now all this is fine and dandy but after review my logs, I noticed something peculiar. I had less than 5000 decrypt events while over 52000 objects had been read. Why is that?
 
 Remember the `bucket_key_enabled = true` in our Terraform config? That's **S3 Bucket Keys** (which has been the default since 2023[^15]). When this is on, S3 generates a short-lived bucket-level key from KMS and caches it. That cached key then creates data keys locally for a bunch of objects without going back to KMS each time. AWS says this reduces KMS API calls by up to 99%[^15]. So instead of 53,000 `kms:Decrypt` calls for 53,000 objects, you get maybe a dozen. The exact cache duration isn't documented either, AWS just calls it "short-lived" and "time-limited."
 
 Without Bucket Keys (legacy setups), S3 _does_ call KMS for every single object[^16]. That would generate a noticeable spike in KMS events. But even then, `kms:Decrypt` and `kms:GenerateDataKey` are completely normal S3 operations that happen millions of times a day in any active AWS account. You'd need a very specific detection rule to distinguish "app doing normal reads/writes" from "attacker encrypting everything in sight." And most SOC teams don't have that rule.
 
-The only management event our attack generated was `ListBuckets` in step 2 (it operates at the account level so it's a management event). That's it. A single `ListBuckets` call buried in the noise of every other service that calls it constantly. Good luck writing an alert for that.
+The only management event our attack generated was `ListBuckets` in step 2 (it operates at the account level so it's a management event). That's it. A single `ListBuckets` call buried in the noise of every other service that calls it constantly.
 
 ---
 
