@@ -91,7 +91,7 @@ Not all 15 buckets look this clean though. Some have versioning off, some use AE
 
 For monitoring, we're going with what I'd call the "smart but cost sensitive" setup that a lot of companies actually run. All CloudTrail management events get forwarded to [REDACTED SIEM VENDOR] through an EventBridge rule set to `ENABLED_WITH_ALL_CLOUDTRAIL_MANAGEMENT_EVENTS`. If you've read my [S3 squatting post](/cases/s3-squatting), you already know why this matters. The short version is that `ENABLED` and `ENABLED_WITH_ALL_CLOUDTRAIL_MANAGEMENT_EVENTS` are not the same thing and the difference is massive:
 
-| Event Category | `ENABLED` | `ENABLED_WITH_ALL_CLOUDTRAIL_MANAGEMENT_EVENTS` |
+| Event Category | `ENABLED` | `ENABLED_WITH_ALL...` |
 |---|---|---|
 | Login events (`ConsoleLogin`, `AssumeRole`, `GetSessionToken`) | No | Yes |
 | IAM recon (`GetRole`, `GetPolicy`, `ListRoles`) | No | Yes |
