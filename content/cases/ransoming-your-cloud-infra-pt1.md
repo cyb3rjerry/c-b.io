@@ -1,5 +1,5 @@
 ---
-title: "ransoming your cloud infra — pt. 1"
+title: "Cloudy With A Chance Of Compromise: How A Skid Ransoms Your Buckets"
 date: 2026-04-04
 severity: "high"
 status: "Open"
@@ -7,13 +7,14 @@ category: "SOC Engineering / Guides"
 threat_actor: ""
 confidence: ""
 tlp: "WHITE"
-tags: ["AWS", "cloud-security", "ransomware", "VPC", "CloudTrail", "detection-engineering", "offensive-security", "defense"]
-mitre: []
+tags: ["AWS", "S3", "KMS", "CloudTrail", "ransomware", "cloud-security", "detection-engineering", "IAM", "data-events", "SSE-KMS", "bucket-keys", "canary-tokens"]
+mitre: ["T1486", "T1485", "T1530", "T1580", "T1059.006"]
 iocs: []
 timeline:
   - { time: "Apr 4, 2026", action: "Started writing about cloud ransomware", detail: "There's barely any research on ransoming cloud infra, figured I'd put something together from a practical perspective." }
-related_cases: ["vulnerability-research"]
-cover:
+  - { time: "Apr 5, 2026", action: "Ran the skid attack against ACME Corp lab", detail: "Encrypted 53K objects in a single bucket, observed KMS events in CloudTrail, documented the blind spots." }
+related_cases: ["vulnerability-research", "s3-squatting"]
+cover: /images/ransoming-your-cloud-infra-pt1/ransom-cover.jpg
 ---
 
 # Preface
@@ -553,7 +554,7 @@ Now for my corpo friends reading this you're probably going "bruuuuh I don't wan
 
 Products like [Tracebit](https://tracebit.com/) handle this for you. They deploy decoy resources across your AWS accounts (S3 buckets, IAM roles, credentials, the works) and alert when anything touches them. Same concept as what we just built but they handle the deployment, rotation and alerting so it doesn't slowly rot in a repo somewhere. What's nice is they can spread canaries across hundreds of accounts in minutes and the detection is near real-time since they're not waiting on CloudTrail's 5 minute publishing cycle. They also rotate and refresh the decoys automatically so your canaries don't go stale, which is the part that always falls apart when you DIY it.
 
-At the end of the day, relying on "we'll notice the outage" as your detection strategy for cloud ransomware is not a plan.
+Relying on "we'll notice the outage" as your detection strategy for cloud ransomware is not a plan.
 
 # Final words
 
