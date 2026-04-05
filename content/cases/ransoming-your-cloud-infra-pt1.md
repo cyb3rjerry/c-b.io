@@ -3,7 +3,7 @@ title: "Cloudy With A Chance Of Compromise: How A Skid Ransoms Your Buckets"
 description: "Encrypting 250GB of S3 data with basic app permissions and barely leaving a trace. The skid approach to cloud ransomware and why your SOC probably wouldn't catch it."
 date: 2026-04-04
 severity: "high"
-status: "Open"
+status: "Closed"
 category: "SOC Engineering / Guides"
 threat_actor: ""
 confidence: ""
@@ -107,6 +107,8 @@ Basically all the stuff an attacker does first when they land in your account is
 What we're _not_ monitoring however is data events. No S3 `GetObject`/`PutObject` logging, no Lambda invocation logs, no DynamoDB item-level activity. Because as we've established, that stuff gets expensive fast and finance said no. This is going to be important later.
 
 # The Skid Attack
+
+For this blogpost we'll only target a single bucket but the script and the general approach are built to scale to the full environment. We'll be reusing this foundation in future parts of the series so that's why some of it looks a bit overkill for one bucket.
 
 For this scenario, let's assume you're a skid that managed to pop an app somehow and you're ok with encrypting the only bucket it has access to (remember, we're a skid here). You've put your hands on an access key whose associated role has a policy like this:
 
@@ -375,7 +377,7 @@ if __name__ == "__main__":
     main()
 ```
 
-We run the script, it does it's thing in roughly 5 minutes and just like that, the content of the buckets go from this
+We run the script from a same-region EC2 instance and in roughly 5 minutes, ~53K objects are encrypted. Scale that up to the full 250GB across all 15 buckets and you're looking at maybe 10-15 minutes. Just like that, the content of the bucket goes from this
 ![](/images/ransoming-your-cloud-infra-pt1/pre-ransom.png)
 
 To whatever this garbage is
